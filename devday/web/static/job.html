@@ -3,23 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>분석 결과 · 흔들림 비교 진단</title>
+<title>Analysis · Wi-ing Wi-ing</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-<main>
-  <a href="/" class="note">← 새 분석</a>
-  <div class="eyebrow" id="files" style="margin-top:10px"></div>
-  <h1 id="title">분석 중이에요</h1>
+<body class="app-body job-page">
+<main class="app-shell job-shell">
+  <header class="app-top">
+    <a class="brand app-brand" href="/" aria-label="Wi-ing Wi-ing home"><img class="brand-logo" src="/static/assets/prometheus-logo.png" alt=""><span class="brand-name">Wi-ing Wi-ing<small>GENIUSES, OBVIOUSLY</small></span></a>
+    <nav><a href="/">Home</a><a href="/equipment">Register Equipment</a><a href="/history">Analysis History</a></nav>
+  </header>
+  <section class="app-heading job-heading">
+    <div class="hero-kicker"><span class="status-dot"></span> INSPECTION WORKSPACE</div>
+    <h1 id="title">분석 중이에요</h1>
+    <p id="job-summary">정상 기준과 점검 영상을 비교하고 있어요.</p>
+    <div class="job-meta" id="files"></div>
+  </section>
   <div id="demo-banner" class="demo-banner" hidden>데모 결과 · 이전 분석의 저장 데이터를 사용했어요. 새 AI 분석을 실행하지 않은 예시 화면입니다.</div>
   <div id="warnings"></div>
-  <section id="progress" class="card">
-    <h2>진행 상황</h2>
-    <ol class="steps" id="steps"></ol>
+  <section id="progress" class="app-card progress-panel">
+    <div class="section-heading">
+      <div><div class="hero-kicker"><span class="status-dot"></span> LIVE PIPELINE</div><h2>진행 상황</h2></div>
+      <span class="progress-state" id="progress-state">진행 중</span>
+    </div>
+    <ol class="steps job-steps" id="steps" aria-live="polite"></ol>
     <p class="note" id="elapsed"></p>
   </section>
   <div id="failure"></div>
-  <div id="result" hidden></div>
+  <div id="result" class="job-result" hidden></div>
 </main>
 <script src="/static/common.js"></script>
 <script>
@@ -147,13 +157,18 @@ async function poll() {
   renderSteps(job);
   if (job.state === 'failed') {
     document.getElementById('title').textContent = '분석하지 못했어요';
+    document.getElementById('job-summary').textContent = '분석을 완료하지 못했어요. 아래 안내를 확인해 주세요.';
+    document.getElementById('progress-state').textContent = '실패';
+    document.getElementById('progress').hidden = true;
     const e = job.error || {};
-    document.getElementById('failure').innerHTML = `<div class="card"><h2>이유</h2><div class="error">${esc(e.message || '')}</div>${(e.hints || []).map(h => `<p>${esc(h)}</p>`).join('')}</div>`;
+    document.getElementById('failure').innerHTML = `<section class="card failure-card"><h2>분석 안내</h2><div class="error">${esc(e.message || '')}</div>${(e.hints || []).map(h => `<p>${esc(h)}</p>`).join('')}<a class="hero-cta form-cta" href="/diagnose">새 점검 시작 <span aria-hidden="true">↗</span></a></section>`;
     return;
   }
   if (job.state === 'done') {
     const r = job.results;
     document.getElementById('title').textContent = '분석 결과';
+    document.getElementById('job-summary').textContent = r.summary || '진단 결과와 분석 근거를 확인해 주세요.';
+    document.getElementById('progress-state').textContent = '완료';
     document.getElementById('demo-banner').hidden = !job.is_demo;
     document.getElementById('progress').hidden = true;
     const out = document.getElementById('result');
@@ -162,6 +177,10 @@ async function poll() {
     return;
   }
   document.getElementById('title').textContent = job.state === 'queued' ? '순서를 기다리는 중이에요' : '분석 중이에요';
+  document.getElementById('job-summary').textContent = job.state === 'queued'
+    ? '앞선 작업이 끝나면 이 점검 영상을 분석해요.'
+    : '정상 기준 영상과 점검 영상을 비교하고 있어요.';
+  document.getElementById('progress-state').textContent = job.state === 'queued' ? '대기 중' : '진행 중';
   timer = setTimeout(poll, 1500);
 }
 init();
