@@ -60,5 +60,5 @@
 | 2026-10-09 (해커톤 기간) | Mac self-hosted runner에서 `main` push 자동 배포, `launchd` 앱·터널 서비스, 로컬 접속 코드 보관, 안전한 앱 재시작을 구성하고 팀 배포 절차를 문서화함. | `44bca3e`, `6b8e70b`, `72754ef`, `57a72ae`; `.github/workflows/deploy-mac.yml`, `deploy_mac.sh`, `launchd/`, `README.md` |
 | 2026-10-09 (해커톤 기간) | 결과 화면에 정상·점검 영상의 ROI별 주파수 스펙트럼 비교를 추가하고, 측정 규칙상 증가한 부위와 AI 추가 점검 후보를 구분해 영상에 표시함. 이는 화면 움직임을 시각화하며 물리 단위 진동이나 고장 위치를 확정하지 않음. | `ac149e5` (`Add vibration spectrum and location visuals`), `devday/render.py`, `devday/workflow.py`, `devday/web/` |
 | 2026-10-09 (해커톤 기간) | 메인 화면에 데모 진입 버튼을 추가함. 기존 완료 기록 하나를 원본 영상 없이 별도 복제하고 저장된 측정값으로 최신 시각화를 생성해 보여주며, 새 분석이나 AI 호출은 하지 않음. 데모를 최근 분석 목록에서 제외하고 데모 표시를 붙임. | `1a73655` (`Add read-only demo result page`), `devday/web/app.py`, `devday/web/static/` |
-| 2026-10-09 (해커톤 기간) | CoffeeTech를 참고한 단일 영어 랜딩 화면과 팀 제공 팬 이미지를 적용함. 장비별 정상 기준 영상을 등록하고, 진단 시 저장된 장비를 골라 점검 영상만 올리는 흐름 및 분석 기록 화면을 구현함. | `0c9fa6a` (`Add asset based anomaly diagnosis flow`), `devday/web/app.py`, `devday/web/static/` |
+| 2026-10-09 (해커톤 기간) | CoffeeTech를 참고한 단일 영어 랜딩 화면과 팀 제공 팬 이미지를 적용함. 장비별 정상 기준 영상을 등록하고, 진단 시 저장된 장비를 골라 점검 영상만 올리는 흐름 및 분석 기록 화면을 구현함. 첫 화면의 작은 화면 구성도 다듬음. | `0c9fa6a` (`Add asset based anomaly diagnosis flow`), `07fe45f` (`Refine landing viewport composition`), `devday/web/app.py`, `devday/web/static/` |
 |  |  |  |
