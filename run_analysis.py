@@ -48,8 +48,8 @@ def main(root=ROOT):
         print(f"[{event['stage']}] {event['status']}", flush=True)
     result = run_pipeline(paths[0], paths[1], capture_fps=settings.CAPTURE_FPS,
         candidate_capture_fps=settings.CANDIDATE_CAPTURE_FPS, output_dir=output,
-        model=settings.MODEL, conditions={'fixed_camera_confirmed':bool(settings.FIXED_CAMERA),
-        'same_setup_declared':True},
+        model=settings.MODEL, conditions={'same_speed_confirmed':bool(settings.SAME_SPEED),
+        'fixed_camera_confirmed':bool(settings.FIXED_CAMERA), 'same_setup_declared':True},
         on_progress=progress)
     print('완료. 진단서:', result['report_html'])
     try:

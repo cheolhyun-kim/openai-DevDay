@@ -73,20 +73,26 @@ def model_view(evidence):
         view[key]=[{k:v for k,v in row.items() if not k.endswith('compensation_sensitivity')} for row in evidence.get(key,[])]
     return view
 
+DECISION_LABELS={'abnormal':'비정상','normal':'정상','insufficient':'판단 불가'}
+
 def final_decision(diagnosis,evidence):
-    """The API is the final adjudicator; the rule pre-filter is retained as advice."""
+    """Guardrail: the reported label requires the model and the rule pre-filter to agree.
+
+    The model can veto a rule flag (e.g. images show a setup change) but cannot declare
+    abnormal without at least one cited comparison that passed every increase rule.
+    """
     prefilter=evidence.get('rule_prefilter',{});rule=prefilter.get('suggested_decision','insufficient')
     model={True:'abnormal',False:'normal',None:'insufficient'}[diagnosis.is_abnormal]
-    if not evidence.get('allowed_evidence_ids') and model!='insufficient':
-        model='insufficient'
-    labels={'abnormal':'비정상','normal':'정상','insufficient':'판단 불가'}
-    reason='AI가 측정 수치와 품질 정보를 종합해 최종 판정했습니다.'
-    return {'label':model,'label_ko':labels[model],'model_decision':model,'rule_decision':rule,
-            'agreement':model==rule,'reason':reason,
-            'cited_numbers':[c.model_dump() for c in diagnosis.decision_basis],
-            'rule_increase_evidence_ids':sorted(prefilter.get('increase_evidence_ids',[])),
-            'rule_decrease_evidence_ids':sorted(prefilter.get('decrease_evidence_ids',[])),
-            'rule_frequency_change_evidence_ids':sorted(prefilter.get('frequency_change_evidence_ids',[]))}
+    cited={c.evidence_id for c in diagnosis.decision_basis}
+    flagged=set(prefilter.get('increase_evidence_ids',[]))
+    if model=='abnormal' and not cited&flagged:
+        label,reason='insufficient','모델이 비정상이라고 했지만, 규칙 기준을 통과한 수치를 인용하지 않아 판단을 보류합니다.'
+    elif model==rule:
+        label,reason=model,'모델 판단과 규칙 사전판정이 일치합니다.'
+    else:
+        label,reason='insufficient',f'모델 판단({DECISION_LABELS[model]})과 규칙 사전판정({DECISION_LABELS[rule]})이 달라 판단을 보류합니다.'
+    return {'label':label,'label_ko':DECISION_LABELS[label],'model_decision':model,'rule_decision':rule,'agreement':label==model==rule,'reason':reason,
+            'cited_numbers':[c.model_dump() for c in diagnosis.decision_basis],'rule_increase_evidence_ids':sorted(flagged)}
 
 def align_plan(plan,metadata,enabled=True):
     """Map reference ROIs into the candidate frame via ORB+RANSAC; fall back to model geometry."""
@@ -181,7 +187,7 @@ def run_pipeline(reference_video,candidate_video,*,capture_fps,output_dir,candid
             write_json(out/'roi_plan.json',plan.model_dump());write_json(out/'configs.json',configs)
             emit('roi_tracking_repair','completed','새 ROI로 정상·대상 영상 모두 재측정')
             tracking_attempt+=1
-        facts={'fixed_camera_confirmed':False,'same_setup_declared':True}
+        facts={'same_speed_confirmed':False,'fixed_camera_confirmed':False,'same_setup_declared':True}
         if conditions:facts.update(conditions)
         evidence=build_evidence(plan,api_metadata,measurements,selected_bands,facts,alignment=alignment,rules=rule_thresholds);write_json(out/'evidence.json',evidence)
         emit('maps','running');artifacts=[]

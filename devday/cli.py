@@ -20,7 +20,7 @@ def main(argv=None):
     run.add_argument('--candidate-capture-fps',type=float);run.add_argument('--out',required=True);run.add_argument('--model');run.add_argument('--frames',type=int,default=3)
     run.add_argument('--band',type=parse_band,action='append');run.add_argument('--roi-plan',help='Reviewed saved ROI plan: skips first API call')
     run.add_argument('--provider',choices=['openai','replay'],default='openai');run.add_argument('--replay-roi');run.add_argument('--replay-diagnosis')
-    run.add_argument('--fixed-camera',action='store_true');run.add_argument('--no-roi-retry',action='store_true')
+    run.add_argument('--same-speed',action='store_true');run.add_argument('--fixed-camera',action='store_true');run.add_argument('--no-roi-retry',action='store_true')
     demo=commands.add_parser('demo',help='Synthetic OFFLINE end-to-end test; no API key or model call')
     demo.add_argument('--out',required=True)
     prepare=commands.add_parser('prepare',help='Extract representative frames only; no API')
@@ -38,7 +38,7 @@ def main(argv=None):
             if args.provider=='replay':
                 if not args.replay_roi or not args.replay_diagnosis:parser.error('Replay requires --replay-roi and --replay-diagnosis')
                 provider=ReplayProvider(args.replay_roi,args.replay_diagnosis)
-            result=run_pipeline(args.normal,args.candidate,capture_fps=args.capture_fps,candidate_capture_fps=args.candidate_capture_fps,output_dir=args.out,provider=provider,model=args.model,frame_count=args.frames,bands=args.band,roi_plan_path=args.roi_plan,roi_repair_attempts=0 if args.no_roi_retry else 1,conditions={'fixed_camera_confirmed':args.fixed_camera},on_progress=progress)
+            result=run_pipeline(args.normal,args.candidate,capture_fps=args.capture_fps,candidate_capture_fps=args.candidate_capture_fps,output_dir=args.out,provider=provider,model=args.model,frame_count=args.frames,bands=args.band,roi_plan_path=args.roi_plan,roi_repair_attempts=0 if args.no_roi_retry else 1,conditions={'same_speed_confirmed':args.same_speed,'fixed_camera_confirmed':args.fixed_camera},on_progress=progress)
         print(json.dumps({k:v for k,v in result.items() if k in ['mode','output_dir','report_html','diagnosis_json','filename']},ensure_ascii=False,indent=2));return 0
     except Exception as exc:
         print(f'{type(exc).__name__}: {exc}',file=sys.stderr);return 1

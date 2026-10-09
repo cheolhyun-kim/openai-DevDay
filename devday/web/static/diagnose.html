@@ -6,6 +6,7 @@
   <section class="app-card"><form id="diagnose-form" class="form-grid">
     <label class="wide">Select equipment<select name="equipment_id" id="equipment-select" required><option value="">Loading equipment…</option></select><small id="reference-info">The saved healthy reference will be used for comparison.</small></label>
     <label class="wide">Inspection video<input name="candidate" type="file" accept="video/*,.mov,.mp4,.m4v,.avi" required><small>Record the same part and camera angle as the healthy reference.</small></label>
+    <label class="check-option"><input type="checkbox" name="same_speed" checked> Same operating speed or setting as the reference</label>
     <label class="check-option"><input type="checkbox" name="fixed_camera" checked> Camera was fixed during recording</label>
     <div class="wide"><button id="run-diagnosis" class="hero-cta form-cta" type="submit" disabled>Analyze Inspection Video <span aria-hidden="true">↗</span></button><div id="diagnose-message" class="form-message" role="status"></div></div>
     <div class="wide empty-assets" id="empty-assets" hidden>No equipment is registered yet. <a href="/equipment">Register equipment and add a healthy reference ↗</a></div>

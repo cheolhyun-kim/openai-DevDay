@@ -16,7 +16,8 @@ OPENAI_API_KEY = ""  # OpenAI를 쓸 때만. run_analysis.command(터미널 실�
 CAPTURE_FPS = None  # 반드시 실제 값으로 바꾸세요.
 CANDIDATE_CAPTURE_FPS = None  # None이면 정상 영상과 같은 FPS 사용
 
-# 카메라를 고정해 촬영했다면 True로 변경
+# 실제로 같은 풍속 / 고정 카메라로 촬영했다면 True로 변경
+SAME_SPEED = False
 FIXED_CAMERA = False
 
 # 실제 시연에 사용한 모델. 다른 지원 모델명으로 바꿀 수 있습니다.

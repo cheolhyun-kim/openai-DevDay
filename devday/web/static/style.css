@@ -121,7 +121,7 @@ td.nw, th.nw { white-space: nowrap; }
 .spectrum img { display: block; width: 100%; border-radius: 10px; background: var(--surface-2); }
 .relative-bar { display: block; min-width: 3px; height: 10px; border-radius: 99px; background: var(--accent); }
 .relative-bar.candidate-increase { background: var(--bad); }
-.relative-bar.candidate-decrease { background: var(--bad); }
+.relative-bar.candidate-decrease { background: var(--good); }
 
 /* Main landing page and English asset workflow */
 .landing-body,.app-body { --bg:#090b0e;--surface:#12161b;--surface-2:#181d23;--text:#f2f0eb;--muted:#a0a4aa;--line:#2b3036;--accent:#d6663f;--accent-ink:#fff; background:var(--bg);color:var(--text); }

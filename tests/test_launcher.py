@@ -13,7 +13,7 @@ class LauncherTests(unittest.TestCase):
     def prepare(self,root):
         (root/'input').mkdir()
         for name in ['normal.mp4','candidate.mp4']:(root/'input'/name).write_bytes(b'test')
-        (root/'settings.py').write_text('NORMAL_VIDEO="input/normal.mp4"\nCANDIDATE_VIDEO="input/candidate.mp4"\nOPENAI_API_KEY="test-local-key"\nCAPTURE_FPS=240\nCANDIDATE_CAPTURE_FPS=179.82\nFIXED_CAMERA=False\nMODEL=None\n')
+        (root/'settings.py').write_text('NORMAL_VIDEO="input/normal.mp4"\nCANDIDATE_VIDEO="input/candidate.mp4"\nOPENAI_API_KEY="test-local-key"\nCAPTURE_FPS=240\nCANDIDATE_CAPTURE_FPS=179.82\nSAME_SPEED=True\nFIXED_CAMERA=False\nMODEL=None\n')
 
     def test_settings_reach_pipeline_and_each_run_has_new_output(self):
         with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{},clear=False):
@@ -26,7 +26,7 @@ class LauncherTests(unittest.TestCase):
             self.assertEqual(first.args,((root/'input/normal.mp4').resolve(),(root/'input/candidate.mp4').resolve()))
             self.assertEqual(first.kwargs['capture_fps'],240)
             self.assertEqual(first.kwargs['candidate_capture_fps'],179.82)
-            self.assertNotIn('same_speed_confirmed',first.kwargs['conditions'])
+            self.assertTrue(first.kwargs['conditions']['same_speed_confirmed'])
             self.assertFalse(first.kwargs['conditions']['fixed_camera_confirmed'])
             self.assertNotEqual(first.kwargs['output_dir'],second.kwargs['output_dir'])
             self.assertEqual(os.environ['OPENAI_API_KEY'],'test-local-key')

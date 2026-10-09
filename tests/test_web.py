@@ -32,7 +32,7 @@ class WebAppTests(unittest.TestCase):
             with TestClient(app) as client:
                 self.assertIn('흔들림 비교 진단', client.get('/').text)
                 files = {'normal': ('normal.avi', normal.read_bytes(), 'video/x-msvideo'), 'candidate': ('candidate.avi', candidate.read_bytes(), 'video/x-msvideo')}
-                r = client.post('/api/jobs', files=files, data={'capture_fps': '120', 'fixed_camera': 'true'})
+                r = client.post('/api/jobs', files=files, data={'capture_fps': '120', 'same_speed': 'true', 'fixed_camera': 'true'})
                 self.assertEqual(r.status_code, 200, r.text)
                 job_id = r.json()['id']
                 self.assertTrue(any('30fps' in w for w in r.json()['warnings']))  # MJPG test file is 30 fps

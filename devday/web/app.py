@@ -39,8 +39,7 @@ STAGES = [('frames', '대표 장면 추출'), ('roi_api', 'AI가 측정할 부�
           ('maps', '측정 지도 그리기'), ('diagnosis_api', 'AI 판정'), ('finished', '완료')]
 METRIC_KO = {'reference_rms_px': '정상 영상 흔들림', 'candidate_rms_px': '점검 영상 흔들림', 'ratio': '흔들림 배율(점검/정상)',
              'z_score': '변화 크기(z)', 'reference_snr': '정상 영상 신호/배경잡음', 'candidate_snr': '점검 영상 신호/배경잡음',
-             'snr_ratio': '신호/잡음 배율', 'reference_dominant_hz': '정상 영상 주요 주파수',
-             'candidate_dominant_hz': '점검 영상 주요 주파수', 'frequency_shift_hz': '주요 주파수 변화량'}
+             'snr_ratio': '신호/잡음 배율'}
 FLAG_KO = {'increase': '증가 기준 충족', 'decrease': '감소', 'no_significant_change': '유의한 변화 없음',
            'below_noise_floor': '배경 잡음 수준', 'not_measurable': '측정 불가'}
 _HEATMAP_MIGRATION_LOCK = threading.Lock()
@@ -213,15 +212,12 @@ def build_results(run_dir):
     for c in (decision or {}).get('cited_numbers', []):
         row = rows.get(c['evidence_id'])
         cited.append({'part': label(row) or c['evidence_id'], 'band': band(row) if row else '', 'metric': METRIC_KO.get(c['metric'], c['metric']),
-                      'unit': 'px' if c['metric'].endswith('_px') else ('Hz' if c['metric'].endswith('_hz') else ''),
-                      'value': c['value'], 'flag': FLAG_KO.get((row or {}).get('rule_flag'), '')})
+                      'unit': 'px' if c['metric'].endswith('_px') else '', 'value': c['value'], 'flag': FLAG_KO.get((row or {}).get('rule_flag'), '')})
     table = []
     for row in evidence.get('region_comparisons', []) + evidence.get('relative_comparisons', []):
         table.append({'id': row['evidence_id'], 'part': label(row), 'band': band(row), 'reference_px': row.get('reference_rms_px'),
                       'candidate_px': row.get('candidate_rms_px'), 'ratio': row.get('ratio'), 'z': row.get('z_score'),
                       'reference_snr': row.get('reference_snr'), 'candidate_snr': row.get('candidate_snr'),
-                      'reference_dominant_hz': row.get('reference_dominant_hz'), 'candidate_dominant_hz': row.get('candidate_dominant_hz'),
-                      'frequency_shift_hz': row.get('frequency_shift_hz'),
                       'flag': row.get('rule_flag'), 'flag_ko': FLAG_KO.get(row.get('rule_flag'), ''), 'used': row.get('eligible_for_interpretation'),
                       'dominant_hz': [row.get('reference_dominant_hz'), row.get('candidate_dominant_hz')],
                       'points': [row.get('reference_points'), row.get('candidate_points')]})
@@ -334,7 +330,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
                 normal_path = d / 'input' / meta['inputs']['normal']['stored']
             result = run_pipeline(normal_path, d / 'input' / meta['inputs']['candidate']['stored'],
                                   capture_fps=meta['capture_fps'], output_dir=d / 'run', provider=provider,
-                                  conditions={'fixed_camera_confirmed': meta['fixed_camera'], 'same_setup_declared': True,
+                                  conditions={'same_speed_confirmed': meta['same_speed'], 'fixed_camera_confirmed': meta['fixed_camera'], 'same_setup_declared': True,
                                               'input_warnings': meta.get('warnings', [])},
                                   on_progress=progress)
             store.update(job_id, state='done', finished_at=now(), decision=result.get('decision'), mode=result.get('mode'))
@@ -475,7 +471,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
 
     @app.post('/api/jobs/from-equipment')
     def create_equipment_job(equipment_id: str = Form(...), candidate: UploadFile = File(...),
-                             fixed_camera: bool = Form(False)):
+                             same_speed: bool = Form(False), fixed_camera: bool = Form(False)):
         folder=equipment_dir(equipment_id)
         item=json.loads((folder/'equipment.json').read_text(encoding='utf-8'))
         normal=item.get('normal') or {}
@@ -494,7 +490,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
             candidate_input,warnings=save_video(candidate,d/'input'/f'candidate{candidate_suffix}',limit,capture_fps)
             meta={'id':job_id,'created_at':now(),'state':'queued','stage':None,'events':[],
                   'inputs':{'normal':normal_input,'candidate':candidate_input},'equipment':{'id':item['id'],'name':item['name'],'model':item.get('model','')},
-                  'capture_fps':capture_fps,'fixed_camera':fixed_camera,
+                  'capture_fps':capture_fps,'same_speed':same_speed,'fixed_camera':fixed_camera,
                   'warnings':warnings+item.get('warnings',[]),'provider':provider_info or {}}
             with store.lock:
                 # Recheck while holding the same lock as deletion: queued work keeps its reference alive.
@@ -609,7 +605,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
 
     @app.post('/api/jobs')
     def create_job(normal: UploadFile = File(...), candidate: UploadFile = File(...), capture_fps: float = Form(240.0),
-                   fixed_camera: bool = Form(False)):
+                   same_speed: bool = Form(False), fixed_camera: bool = Form(False)):
         if not (1 <= capture_fps <= 10000):
             raise HTTPException(400, '촬영 FPS를 확인해주세요 (예: 240).')
         for f in (normal, candidate):
@@ -634,7 +630,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
         except ValueError as exc:
             shutil.rmtree(d, ignore_errors=True); raise HTTPException(400, str(exc))
         meta = {'id': job_id, 'created_at': now(), 'state': 'queued', 'stage': None, 'events': [], 'inputs': inputs,
-                'capture_fps': capture_fps, 'fixed_camera': fixed_camera, 'warnings': warnings,
+                'capture_fps': capture_fps, 'same_speed': same_speed, 'fixed_camera': fixed_camera, 'warnings': warnings,
                 'provider': provider_info or {}}
         (d / 'job.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding='utf-8')
         executor.submit(run_job, job_id)

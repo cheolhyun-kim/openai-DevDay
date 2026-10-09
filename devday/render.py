@@ -165,15 +165,15 @@ def reports(directory,diagnosis,evidence,artifacts,mode,decision=None):
     title={'suspected_abnormal':'확인해볼 흔들림이 있어요','no_clear_difference':'뚜렷하게 달라진 흔들림은 찾지 못했어요','inconclusive':'이번 영상으로는 판단하기 어려워요'}[diagnosis.assessment]
     summary={'suspected_abnormal':'정상 영상과 비교했을 때 움직임에 차이가 있어요. 아래에 표시한 곳을 한 번 확인해보세요.','no_clear_difference':'이번 비교에서는 큰 차이를 찾지 못했어요. 다만 영상만으로 정상 상태를 보장할 수는 없어요.','inconclusive':'부위가 잘 보이지 않거나 움직임을 안정적으로 따라가기 어려웠어요. 같은 위치와 풍속으로 다시 촬영해보세요.'}[diagnosis.assessment]
     if decision is not None:
-        title={'abnormal':'비정상: 정상 영상과 비교해 의미 있는 변화가 있어요','normal':'정상: 정상 영상과 비교해 의미 있는 변화가 없어요','insufficient':'판단 불가: 이번 영상으로는 판단하기 어려워요'}[decision['label']]
+        title={'abnormal':'비정상: 정상 영상보다 흔들림이 커졌어요','normal':'정상: 정상 영상과 비교해 커진 흔들림이 없어요','insufficient':'판단 불가: 이번 영상으로는 판단하기 어려워요'}[decision['label']]
         if decision['label']=='insufficient' and decision['model_decision']!=decision['rule_decision']:
             summary='AI 판단과 수치 규칙이 서로 달라 결론을 보류했어요. 같은 위치와 조건에서 다시 촬영해 확인해보세요.'
         elif decision['label']=='normal':
-            summary='측정 품질이 충분하고, 정상 영상과 비교해 의미 있는 진동 크기나 주파수 변화가 없었어요.'
+            summary='배경 잡음보다 큰 움직임은 측정됐지만, 정상 영상보다 의미 있게 커진 곳은 없었어요.'
     names={r['id']:r['part_name'] for r in evidence.get('roi_plan',{}).get('regions',[])}
     numbers='';number_lines=[]
     if decision is not None:
-        metric_ko={'reference_rms_px':'정상 영상 흔들림(px)','candidate_rms_px':'대상 영상 흔들림(px)','ratio':'흔들림 배율(대상/정상)','z_score':'변화 크기(z)','reference_snr':'정상 영상 신호/배경잡음','candidate_snr':'대상 영상 신호/배경잡음','snr_ratio':'신호/잡음 배율','reference_dominant_hz':'정상 영상 주요 주파수(Hz)','candidate_dominant_hz':'대상 영상 주요 주파수(Hz)','frequency_shift_hz':'주요 주파수 변화량(Hz)'}
+        metric_ko={'reference_rms_px':'정상 영상 흔들림(px)','candidate_rms_px':'대상 영상 흔들림(px)','ratio':'흔들림 배율(대상/정상)','z_score':'변화 크기(z)','reference_snr':'정상 영상 신호/배경잡음','candidate_snr':'대상 영상 신호/배경잡음','snr_ratio':'신호/잡음 배율'}
         rows_html=[]
         for c in decision['cited_numbers']:
             row=next((r for r in evidence.get('region_comparisons',[])+evidence.get('relative_comparisons',[]) if r['evidence_id']==c['evidence_id']),{})

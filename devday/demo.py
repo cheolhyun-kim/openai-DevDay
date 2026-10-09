@@ -47,4 +47,4 @@ def run_demo(output_dir,on_progress=None):
     out=Path(output_dir);out.mkdir(parents=True,exist_ok=True)
     if any(out.iterdir()):raise ValueError('Use new/empty demo directory')
     normal,candidate=videos(out/'input')
-    return run_pipeline(normal,candidate,capture_fps=120,output_dir=out/'run',provider=SyntheticProvider(),bands=[('rotation',20.,27.)],on_progress=on_progress,conditions={'fixed_camera_confirmed':True})
+    return run_pipeline(normal,candidate,capture_fps=120,output_dir=out/'run',provider=SyntheticProvider(),bands=[('rotation',20.,27.)],on_progress=on_progress,conditions={'same_speed_confirmed':True,'fixed_camera_confirmed':True})

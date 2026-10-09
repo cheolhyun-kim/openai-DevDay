@@ -18,6 +18,7 @@
     ]
   ],
   "conditions": {
+    "same_speed_confirmed": false,
     "fixed_camera_confirmed": false,
     "capture_fps_verified_by_user": false,
     "timebase_basis": "120 fps from filenames/container metadata; provisional",

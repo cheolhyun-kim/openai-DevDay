@@ -46,8 +46,7 @@ def band_shape(signal,fs,lo,hi):
     share=float(p[max(i-2,0):i+3].sum()/p[sel].sum())
     spec=np.fft.rfft(y-y.mean());ff=np.fft.rfftfreq(len(y),1/fs);spec[(ff<lo)|(ff>hi)]=0
     bp=np.fft.irfft(spec,len(y))
-    return {'dominant_hz':float(f[i]),'frequency_resolution_hz':float(fs/len(y)),
-            'peak_power_share':share,'kurtosis':float(kurtosis(bp))}
+    return {'dominant_hz':float(f[i]),'peak_power_share':share,'kurtosis':float(kurtosis(bp))}
 
 def window_rms(signal,fs,lo,hi,nperseg):
     out=[]
@@ -193,8 +192,6 @@ def build_evidence(plan,metadata,measurements,bands,conditions,alignment=None,ru
                  **c,
                  'reference_background_floor_px':_r(rf,5),'candidate_background_floor_px':_r(cf,5),
                  'reference_dominant_hz':_r(av.get('dominant_hz'),2),'candidate_dominant_hz':_r(bv.get('dominant_hz'),2),
-                 'frequency_shift_hz':_r(abs(av.get('dominant_hz')-bv.get('dominant_hz')) if av.get('dominant_hz') is not None and bv.get('dominant_hz') is not None else None,2),
-                 'frequency_resolution_hz':_r(max(av.get('frequency_resolution_hz') or 0,bv.get('frequency_resolution_hz') or 0) or None,3),
                  'reference_peak_power_share':_r(av.get('peak_power_share'),3),'candidate_peak_power_share':_r(bv.get('peak_power_share'),3),
                  'reference_kurtosis':_r(av.get('kurtosis'),2),'candidate_kurtosis':_r(bv.get('kurtosis'),2),
                  'reference_points':a.get('retained_points',0),'candidate_points':b.get('retained_points',0),
@@ -218,26 +215,19 @@ def build_evidence(plan,metadata,measurements,bands,conditions,alignment=None,ru
             if eligible: allowed.append(eid)
     increases=[r['evidence_id'] for r in comparisons if r['eligible_for_interpretation'] and r['rule_flag']=='increase' and not r['sparse_tracking']]
     increases+=[r['evidence_id'] for r in relative if r['eligible_for_interpretation'] and r['rule_flag']=='increase']
-    decreases=[r['evidence_id'] for r in comparisons if r['eligible_for_interpretation'] and r['rule_flag']=='decrease' and not r['sparse_tracking']]
-    decreases+=[r['evidence_id'] for r in relative if r['eligible_for_interpretation'] and r['rule_flag']=='decrease']
-    frequency_changes=[r['evidence_id'] for r in comparisons if r['eligible_for_interpretation'] and not r['sparse_tracking']
-                       and r.get('frequency_shift_hz') is not None and r.get('frequency_resolution_hz') is not None
-                       and r['frequency_shift_hz']>r['frequency_resolution_hz']
-                       and min(r.get('reference_peak_power_share') or 0,r.get('candidate_peak_power_share') or 0)>=.2]
     measurable=[r['evidence_id'] for r in comparisons+relative if r['eligible_for_interpretation']]
     sparse_increases=[r['evidence_id'] for r in comparisons if r['eligible_for_interpretation'] and r['rule_flag']=='increase' and r['sparse_tracking']]
     solid=[r['evidence_id'] for r in comparisons if r['eligible_for_interpretation'] and not r['sparse_tracking']]+[r['evidence_id'] for r in relative if r['eligible_for_interpretation']]
-    if increases or decreases or frequency_changes:decision,reason='abnormal','Eligible amplitude change in either direction or resolvable dominant-frequency change found.'
+    if increases:decision,reason='abnormal','At least one eligible comparison passes every increase rule.'
     elif sparse_increases:decision,reason='insufficient','Only sparsely tracked comparisons show an increase; not enough to decide either way.'
     elif solid:decision,reason='normal','Well-tracked eligible comparisons exist above the noise floor, and none passes the increase rules.'
     else:decision,reason='insufficient','No comparison is both setup-eligible and above the background noise floor.'
-    prefilter={'suggested_decision':decision,'reason':reason,'increase_evidence_ids':increases,'decrease_evidence_ids':decreases,
-               'frequency_change_evidence_ids':frequency_changes,'measurable_evidence_ids':measurable,
+    prefilter={'suggested_decision':decision,'reason':reason,'increase_evidence_ids':increases,'measurable_evidence_ids':measurable,
                'thresholds':{'snr_min':rules['snr_min'],'ratio_min':rules['ratio_min'],'z_min':rules['z_min'],'min_points_for_abnormal':rules['min_points']},
                'rules':{'below_noise_floor':'max(reference_snr, candidate_snr) < snr_min',
                         'increase':'ratio >= ratio_min AND snr_ratio >= ratio_min AND z_score >= z_min AND candidate_snr >= snr_min',
                         'decrease':'ratio <= 1/ratio_min AND z_score <= -z_min',
-                        'frequency_change':'eligible dominant frequency shift exceeds the coarser frequency-bin resolution, with peak_power_share >= 0.2 on both clips','abnormal':'eligible amplitude increase, eligible amplitude decrease, or resolvable dominant-frequency shift','normal':'no material amplitude change in either direction and no resolvable frequency change in eligible comparisons','low_semantic_confidence':'counts only with >= min_points on both sides','flicker_affected':'ROIs that lost points to brightness flicker need ratio >= 2*ratio_min and z >= 2*z_min for increase'}}
+                        'abnormal':'any eligible non-sparse comparison flagged increase','normal':'no increase at all and at least one eligible non-sparse comparison','low_semantic_confidence':'counts only with >= min_points on both sides','flicker_affected':'ROIs that lost points to brightness flicker need ratio >= 2*ratio_min and z >= 2*z_min for increase'}}
     return {'schema_version':'devday.evidence/2','roi_plan':plan.model_dump(),'videos':metadata,'conditions':conditions,'alignment':alignment,'setup':{'eligible':setup_ok,'basis':setup_basis,'model_assessment':plan.same_setup_assessment,'registration_limits':REGISTRATION_LIMITS},'measurements':measurements,
             'background_noise_floor_px':{bn:{'reference':_r(floors[bn][0],5),'candidate':_r(floors[bn][1],5)} for bn,_,_ in bands},
             'region_comparisons':comparisons,'relative_comparisons':relative,'rule_prefilter':prefilter,'allowed_evidence_ids':allowed,

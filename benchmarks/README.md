@@ -141,7 +141,7 @@ python -m devday.benchmark register --manifest benchmarks/fan_manifest.json --ou
 python -m devday.benchmark run --dataset results/fan-dataset-v1/dataset.json --options benchmarks/options.measurement.json --revision baseline --repeats 5 --out results/bench-baseline
 ```
 
-사례당 ROI가 없다면 options JSON의 `roi_plan_path`로 공통 계획을 지정할 수 있다. options 내 경로는 실행 디렉터리 기준이다. 실제 촬영 조건을 기록하고 분석에 사용한 FPS와 배경 추적 품질을 확인한다. 저장된 ROI가 시작 구간마다 적절한지는 먼저 점검한다.
+사례당 ROI가 없다면 options JSON의 `roi_plan_path`로 공통 계획을 지정할 수 있다. options 내 경로는 실행 디렉터리 기준이다. 실제 촬영 조건을 확인한 후 `same_speed_confirmed`, `fixed_camera_confirmed`를 변경한다. 저장된 ROI가 시작 구간마다 적절한지는 먼저 점검한다.
 
 전체 API 평가는 options.full.json을 복사해 사용할 모델과 확인된 촬영 조건을 명시한 후 실행한다. OpenAI API 키는 프로젝트 루트의 `settings.py`에 `OPENAI_API_KEY = "본인 키"`로 입력하거나 환경변수로 제공한다. `settings.py`의 키가 채워져 있으면 해당 키를 우선 사용한다. `settings.py`는 Git에서 제외되며 키를 benchmark options JSON에 넣지 않는다. `full`과 `fixed-roi` 모드에서 실제 외부 호출과 비용이 발생한다. 미완료/거부 응답을 성공으로 대체하지 않는다. 코드에 있는 재시도를 그대로 실행하고 최종 실패도 집계한다.
 
