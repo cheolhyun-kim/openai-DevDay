@@ -218,7 +218,8 @@ def run_pipeline(reference_video,candidate_video,*,capture_fps,output_dir,candid
             emit('diagnosis_api','completed')
         write_json(out/'diagnosis.json',diagnosis.model_dump())
         decision=final_decision(diagnosis,evidence);write_json(out/'decision.json',decision)
-        visual=out/'visuals';visual.mkdir(exist_ok=True);overlay=visual/'inspection_roi.png'
+        visual=out/'visuals';visual.mkdir(exist_ok=True)
+        overlay=visual/'inspection_roi.png'
         inspection_map(metadata['candidate']['frames'][0]['path'],configs['candidate'],diagnosis,overlay,evidence=evidence,maps=maps);artifacts.append(overlay)
         reports(out,diagnosis,evidence,artifacts,model_provider.mode,decision=decision)
         result={'mode':model_provider.mode,'output_dir':str(out),'report_html':str(out/'report.html'),'diagnosis_json':str(out/'diagnosis.json'),'evidence_json':str(out/'evidence.json'),'roi_plan_json':str(out/'roi_plan.json'),'visualizations':[str(p) for p in artifacts],'diagnosis':diagnosis.model_dump(),'decision':decision,'model_calls':getattr(model_provider,'calls',[])}

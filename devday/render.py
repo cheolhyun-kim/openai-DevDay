@@ -10,12 +10,32 @@ os.environ.setdefault("MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "devday-
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from .vendor.fanvib.pipeline import roi_mask
 from scipy.signal import welch
 
 LABELS={'suspected_abnormal':'이상 의심','no_clear_difference':'뚜렷한 차이 없음','inconclusive':'측정·판단 불충분'}
 LIVE_MODES={'openai_live','claude_live'}
 DECISION_KO={'abnormal':'비정상','normal':'정상','insufficient':'판단 불가'}
+
+def _korean_font():
+    """Choose a Korean-capable font when the host has one; charts still work otherwise."""
+    available={f.name for f in font_manager.fontManager.ttflist}
+    selected=False
+    for name in ('Apple SD Gothic Neo','AppleGothic','Malgun Gothic','NanumGothic','Noto Sans CJK KR','Noto Sans CJK JP','Noto Sans KR','Arial Unicode MS'):
+        if name in available:
+            plt.rcParams['font.family']=name
+            selected=True
+            break
+    plt.rcParams['axes.unicode_minus']=False
+    return selected
+
+
+def _english_roi_name(roi_id):
+    return {'head_hub':'Fan center hub','head_guard_rim':'Outer guard rim','head_guard_clips':'Guard clips',
+            'neck_joint':'Head/neck joint','pole_collar':'Pole collar','pole_base_joint':'Pole/base joint',
+            'base_controls':'Base controls','base_edge':'Base edge'}.get(roi_id,str(roi_id).replace('_',' ').title())
+
 
 def heatmaps(directory,frame_paths,maps,evidence,bands):
     directory=Path(directory);directory.mkdir(exist_ok=True);paths=[]
@@ -40,18 +60,20 @@ def heatmaps(directory,frame_paths,maps,evidence,bands):
                 v=m['band_values'][bn];color=v[good] if v is not None else np.zeros(good.sum())
             if good.any():
                 sc=ax.scatter(xy[good,0],xy[good,1],c=color,s=23,cmap='coolwarm' if difference else 'turbo',vmin=-dmax if difference else 0,vmax=dmax if difference else vmax,edgecolors='black',linewidths=.2)
-                fig.colorbar(sc,ax=ax,shrink=.5,label='Difference (px RMS)' if difference else 'px RMS')
+                fig.colorbar(sc,ax=ax,shrink=.5,label='움직임 차이 (px RMS)' if difference else '움직임 크기 (px RMS)')
             for name in rows:
                 sel=labels==name
                 if sel.any():
                     x,y=np.median(xy[sel],axis=0);ax.text(x,y,name,fontsize=7,bbox={'facecolor':'white','alpha':.8,'edgecolor':'none'})
-            ax.set_title('Candidate - reference regional medians' if difference else side);ax.axis('off')
-        fig.suptitle(f'{lo:g}-{hi:g} Hz measured image movement; gray X: excluded; NOT fault probability')
+            title='확인 영상 - 기준 영상 (부위별 차이)' if difference else ('기준 영상' if side=='reference' else '확인 영상')
+            ax.set_title(title);ax.axis('off')
+        fig.suptitle(f'{lo:g}–{hi:g} Hz 대역별 화면 흔들림 · 회색 X: 판정 제외 · 고장 확률 아님')
         path=directory/f'heatmap_{bn}.png';fig.savefig(path,dpi=140);plt.close(fig);paths.append(path)
     return paths
 
 def spectrum_comparison(directory, measurement_dirs, regions, alignment, bands):
     """Plot paired Welch spectra from the same tracked target ROIs."""
+    korean_font=_korean_font()
     directory=Path(directory); directory.mkdir(parents=True,exist_ok=True)
     traces=[]
     for region in regions:
@@ -73,23 +95,22 @@ def spectrum_comparison(directory, measurement_dirs, regions, alignment, bands):
             hz,psd=welch(signal,fs=fps,nperseg=nperseg,detrend='linear',axis=0)
             paired.append((hz,np.maximum(psd.sum(axis=1),1e-16)))
         if len(paired)==2:
-            traces.append((region['part_name'],paired))
+            traces.append((region['part_name'],region['id'],paired))
     if not traces:return None
     cols=2; rows=(len(traces)+cols-1)//cols
-    fig,axs=plt.subplots(rows,cols,figsize=(13,4.1*rows),squeeze=False,layout='constrained')
-    for ax,(name,paired) in zip(axs.flat,traces):
+    fig,axs=plt.subplots(rows,cols,figsize=(12,3.5*rows),squeeze=False,layout='constrained')
+    for ax,(name,roi_id,paired) in zip(axs.flat,traces):
         (href,pref),(hcand,pcand)=paired
         max_hz=min(href[-1],hcand[-1])
         for i,(_,lo,hi) in enumerate(bands):
             if lo<max_hz: ax.axvspan(lo,min(hi,max_hz),color='#f0b44d',alpha=.10,zorder=0)
-        ax.semilogy(href,pref,label='Normal',color='#3182bd',linewidth=1.5)
-        ax.semilogy(hcand,pcand,label='Inspection',color='#e45745',linewidth=1.5)
-        ax.set_xlim(0,max_hz);ax.set_title(str(name));ax.set_xlabel('Frequency (Hz)');ax.set_ylabel('Motion PSD (px²/Hz)')
+        ax.semilogy(href,pref,label='기준 영상' if korean_font else 'Reference',color='#3182bd',linewidth=1.5)
+        ax.semilogy(hcand,pcand,label='후보 영상' if korean_font else 'Candidate',color='#e45745',linewidth=1.5)
+        ax.set_xlim(0,max_hz);ax.set_title(str(name) if korean_font else _english_roi_name(roi_id));ax.set_xlabel('Frequency (Hz)');ax.set_ylabel('Motion PSD (px²/Hz)')
         ax.grid(True,which='both',alpha=.2)
     for ax in list(axs.flat)[len(traces):]:ax.remove()
-    handles,labels=axs.flat[0].get_legend_handles_labels()
-    fig.legend(handles,labels,loc='upper center',ncol=2,frameon=False)
-    fig.suptitle('Frequency spectrum comparison · measured image motion',y=1.02,fontsize=15)
+    axs.flat[0].legend(loc='upper right',fontsize=8,frameon=True,framealpha=.9)
+    fig.suptitle('Frequency spectrum comparison',fontsize=15,fontweight='bold')
     path=directory/'spectrum_comparison.png';fig.savefig(path,dpi=150,bbox_inches='tight');plt.close(fig)
     return path
 
