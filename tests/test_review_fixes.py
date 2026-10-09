@@ -89,15 +89,36 @@ class CitationsAndGuardrail(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_diagnosis(diag('suspected_abnormal', [{'evidence_id': 'bearing:low', 'metric': 'ratio', 'value': 4.0}]), self.e)
 
-    def test_disagreement_becomes_undetermined(self):
+    def test_api_decision_is_final_when_rule_recommends_another_label(self):
         d = validate_diagnosis(diag('no_clear_difference', [{'evidence_id': 'head:low', 'metric': 'ratio', 'value': 4.0}]), self.e)
         decision = final_decision(d, self.e)
-        self.assertEqual(decision['label'], 'insufficient'); self.assertFalse(decision['agreement'])
+        self.assertEqual(decision['label'], 'normal'); self.assertFalse(decision['agreement'])
 
-    def test_abnormal_without_rule_flagged_citation_is_undetermined(self):
+    def test_api_can_flag_a_decrease_without_rule_increase(self):
         e = build_evidence(ROIPlan.model_validate(PLAN), {}, measurements(.05, .055), [('low', 1, 10)], {})
+        e['allowed_evidence_ids']=['head:low']
         d = validate_diagnosis(diag('suspected_abnormal', [{'evidence_id': 'head:low', 'metric': 'ratio', 'value': 1.1}]), e)
-        self.assertEqual(final_decision(d, e)['label'], 'insufficient')
+        self.assertEqual(final_decision(d, e)['label'], 'abnormal')
+
+    def test_ratios_below_one_are_not_automatically_normal(self):
+        for ratio in (.59, .73):
+            with self.subTest(ratio=ratio):
+                e = build_evidence(ROIPlan.model_validate(PLAN), {}, measurements(.05, .05 * ratio), [('low', 1, 10)], {})
+                row = e['region_comparisons'][0]
+                self.assertAlmostEqual(row['ratio'], ratio, places=2)
+                d = validate_diagnosis(diag('suspected_abnormal', [{'evidence_id': 'head:low', 'metric': 'ratio', 'value': row['ratio']}]), e)
+                self.assertEqual(final_decision(d, e)['label'], 'abnormal')
+
+    def test_frequency_change_is_citable_and_suggested(self):
+        m=measurements(.05,.055)
+        for side,peak in [('reference',17.3),('candidate',13.6)]:
+            m[side]['regions']['head']['bands']['low'].update({'dominant_hz':peak,'frequency_resolution_hz':.25,'peak_power_share':.8})
+        e=build_evidence(ROIPlan.model_validate(PLAN),{},m,[('low',1,30)],{})
+        row=e['region_comparisons'][0]
+        self.assertEqual(row['frequency_shift_hz'],3.7)
+        self.assertEqual(e['rule_prefilter']['frequency_change_evidence_ids'],['head:low'])
+        d=validate_diagnosis(diag('suspected_abnormal',[{'evidence_id':'head:low','metric':'frequency_shift_hz','value':3.7}]),e)
+        self.assertEqual(final_decision(d,e)['label'],'abnormal')
 
 
 class Registration(unittest.TestCase):

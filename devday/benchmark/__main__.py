@@ -37,7 +37,7 @@ def demo(output):
     write_json(out / "manifest.json", {"schema_version": "devday.dataset/1", "recordings": sources, "clips": clips, "cases": cases})
     dataset = prepare(out / "manifest.json", out / "dataset")
     options = {"mode": "measurement", "bands": [["rotation", 20, 27]], "align_candidate": False,
-               "conditions": {"same_speed_confirmed": True, "fixed_camera_confirmed": True}}
+               "conditions": {"fixed_camera_confirmed": True}}
     metadata, rows = run(dataset, out / "baseline", "synthetic-measurement", options=options, repeats=2)
     render(out / "baseline" / "report", metadata, rows)
     return out / "baseline" / "report" / "report.html"

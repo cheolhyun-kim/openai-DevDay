@@ -92,7 +92,6 @@ CANDIDATE_CAPTURE_FPS = None  # None이면 위와 같은 값
 
 MODEL = "gpt-6-luna"  # 실제 시연 모델
 
-SAME_SPEED = True     # 실제로 두 영상의 풍속이 같을 때만 True
 FIXED_CAMERA = True   # 실제로 카메라를 고정했을 때만 True
 ```
 
@@ -184,7 +183,7 @@ macOS에서는 `setup.command`를 실행해도 됩니다. 라이브러리 설치
 - `OPENAI_API_KEY`: 따옴표 안에 본인 키 입력.
 - `CAPTURE_FPS`: 실제 촬영 FPS. 두 영상이 다르면 `CANDIDATE_CAPTURE_FPS`도 설정.
 
-기본 경로는 `input/normal.mp4`, `input/candidate.mp4`입니다. 여기에 영상을 복사하거나 설정 파일에 기존 영상의 절대 경로를 넣으세요. MOV 파일도 경로를 바꾸면 사용할 수 있습니다. `SAME_SPEED`, `FIXED_CAMERA`는 실제 촬영 조건에 맞게 설정하세요.
+기본 경로는 `input/normal.mp4`, `input/candidate.mp4`입니다. 여기에 영상을 복사하거나 설정 파일에 기존 영상의 절대 경로를 넣으세요. MOV 파일도 경로를 바꾸면 사용할 수 있습니다. `FIXED_CAMERA`는 실제 촬영 조건에 맞게 설정하세요.
 
 `run_analysis.command`를 더블클릭하면 실제 API → 측정 → API 진단을 실행합니다. 기존 `run_demo.command`도 이제 같은 실제 분석을 실행합니다. 결과는 매번 새 `results/analysis-...` 폴더의 `report.html`에 저장하고, 완료 시 진단서만 기본 브라우저에서 자동으로 엽니다. 세부 측정값과 이미지 등 결과 폴더의 구성은 그대로 유지합니다. 브라우저 실행이 실패해도 저장된 분석 결과는 유지됩니다. 키나 영상/FPS 설정이 없으면 중단하며 예시 응답으로 대체하지 않습니다.
 
@@ -209,7 +208,7 @@ python -m devday run \
   --normal '/경로/정상.mov' \
   --candidate '/경로/비교대상.mov' \
   --capture-fps 240 \
-  --same-speed --fixed-camera \
+  --fixed-camera \
   --out results/experiment-001
 ```
 
@@ -259,7 +258,7 @@ result = run_pipeline(
     candidate_video=candidate_path,
     capture_fps=240,
     output_dir=new_job_directory,
-    conditions={"same_speed_confirmed": True, "fixed_camera_confirmed": True},
+    conditions={"fixed_camera_confirmed": True},
     on_progress=lambda event: update_ui(event),
 )
 # result['report_html'], result['visualizations'], result['diagnosis']를 표시

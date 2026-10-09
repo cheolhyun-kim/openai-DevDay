@@ -80,12 +80,14 @@ class Inspection(StrictModel):
     alternative_explanations: list[str]
     action: str
 
-CITABLE_METRICS=('reference_rms_px','candidate_rms_px','ratio','z_score','reference_snr','candidate_snr','snr_ratio')
+CITABLE_METRICS=('reference_rms_px','candidate_rms_px','ratio','z_score','reference_snr','candidate_snr','snr_ratio',
+                'reference_dominant_hz','candidate_dominant_hz','frequency_shift_hz')
 
 class Citation(StrictModel):
     """One number the model relies on; code checks it against evidence.json."""
     evidence_id: str
-    metric: Literal['reference_rms_px','candidate_rms_px','ratio','z_score','reference_snr','candidate_snr','snr_ratio']
+    metric: Literal['reference_rms_px','candidate_rms_px','ratio','z_score','reference_snr','candidate_snr','snr_ratio',
+                    'reference_dominant_hz','candidate_dominant_hz','frequency_shift_hz']
     value: float
 
 class Diagnosis(StrictModel):

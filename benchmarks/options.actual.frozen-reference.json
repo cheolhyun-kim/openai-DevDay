@@ -14,7 +14,6 @@
     ]
   ],
   "conditions": {
-    "same_speed_confirmed": true,
     "fixed_camera_confirmed": false,
     "capture_fps_verified_by_user": false,
     "timebase_basis": "encoded 240fps / minimum PTS spacing; provisional",
