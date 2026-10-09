@@ -20,6 +20,11 @@ h1 { font-size: 28px; margin: 4px 0 6px; letter-spacing: -0.01em; }
 h2 { font-size: 19px; margin: 0 0 14px; }
 .eyebrow { color: var(--muted); font-size: 14px; }
 .lead { color: var(--muted); margin: 0 0 24px; }
+.home-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+.home-heading h1 { margin-bottom: 0; }
+.demo-link { flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; color: var(--muted); font-size: 12px; text-decoration: none; background: var(--surface); }
+.demo-link:hover { color: var(--accent); border-color: var(--accent); }
+.demo-banner { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 10px 14px; margin: 12px 0 18px; font-size: 14px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin-bottom: 18px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } main { padding: 20px 16px 48px; } h1 { font-size: 24px; } }

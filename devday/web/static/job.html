@@ -11,6 +11,7 @@
   <a href="/" class="note">← 새 분석</a>
   <div class="eyebrow" id="files" style="margin-top:10px"></div>
   <h1 id="title">분석 중이에요</h1>
+  <div id="demo-banner" class="demo-banner" hidden>데모 결과 · 이전 분석의 저장 데이터를 사용했어요. 새 AI 분석을 실행하지 않은 예시 화면입니다.</div>
   <div id="warnings"></div>
   <section id="progress" class="card">
     <h2>진행 상황</h2>
@@ -145,6 +146,7 @@ async function poll() {
   if (job.state === 'done') {
     const r = job.results;
     document.getElementById('title').textContent = '분석 결과';
+    document.getElementById('demo-banner').hidden = !job.is_demo;
     document.getElementById('progress').hidden = true;
     const out = document.getElementById('result');
     out.innerHTML = verdictCard(r) + citedCard(r) + checksCard(r) + spectrumCard(r) + tableCard(r) + galleryCard(r) + infoCard(r);

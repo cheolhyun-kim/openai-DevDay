@@ -253,6 +253,84 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
     def index():
         return (STATIC / 'index.html').read_text(encoding='utf-8')
 
+    def ensure_demo_job():
+        """Make one read-only demo snapshot from an existing completed analysis; never call a model."""
+        existing = next((m for m in store.all() if m.get('is_demo') and m.get('state') == 'done'), None)
+        if existing:
+            return existing['id']
+        sources=[]
+        for meta in store.all():
+            if meta.get('is_demo') or meta.get('state') != 'done':
+                continue
+            run=store.root/meta['id']/'run'
+            if not all((run/name).is_file() for name in ('result.json','evidence.json','diagnosis.json','decision.json','roi_plan.json','configs.json')):
+                continue
+            decision=json.loads((run/'decision.json').read_text(encoding='utf-8'))
+            evidence=json.loads((run/'evidence.json').read_text(encoding='utf-8'))
+            usable=sum(1 for row in evidence.get('region_comparisons',[]) if row.get('eligible_for_interpretation'))
+            increases=sum(1 for row in evidence.get('region_comparisons',[]) if row.get('eligible_for_interpretation') and row.get('rule_flag')=='increase')
+            has_signals=all((run/'measurements'/side/'signals.npz').is_file() for side in ('reference','candidate'))
+            has_frames=any((run/'frames'/side).is_dir() for side in ('reference','candidate'))
+            score=(has_signals, has_frames, decision.get('label')=='abnormal', increases, usable, meta.get('created_at',''))
+            sources.append((score,meta))
+        if not sources:
+            raise HTTPException(404,'완료된 이전 분석 기록이 없어 데모를 열 수 없어요.')
+        source=max(sources,key=lambda item:item[0])[1]
+        source_dir=store.root/source['id']
+        demo_id=store.new_id()
+        while (store.root/demo_id).exists():demo_id=store.new_id()
+        demo_dir=store.root/demo_id
+        try:
+            shutil.copytree(source_dir/'run',demo_dir/'run')
+            run=demo_dir/'run'
+            try:
+                import numpy as np
+                from ..contracts import Diagnosis
+                from ..render import inspection_map, reports, spectrum_comparison
+                plan=json.loads((run/'roi_plan.json').read_text(encoding='utf-8'))
+                configs=json.loads((run/'configs.json').read_text(encoding='utf-8'))
+                evidence=json.loads((run/'evidence.json').read_text(encoding='utf-8'))
+                diagnosis=Diagnosis.model_validate(json.loads((run/'diagnosis.json').read_text(encoding='utf-8')))
+                alignment=json.loads((run/'alignment.json').read_text(encoding='utf-8')).get('registration',{})
+                band_map={}
+                for row in evidence.get('region_comparisons',[]):
+                    name=row['evidence_id'].rsplit(':',1)[-1]
+                    lo,hi=row.get('band_hz') or (None,None)
+                    if lo is not None:band_map[name]=(name,float(lo),float(hi))
+                bands=list(band_map.values())
+                spectrum=spectrum_comparison(run/'visuals',{side:run/'measurements'/side for side in ('reference','candidate')},
+                    [r for r in plan.get('regions',[]) if r.get('role')=='target'],alignment,bands)
+                maps={}
+                for side in ('reference','candidate'):
+                    track=run/'measurements'/side/'tracks.npz'
+                    if not track.is_file():continue
+                    with np.load(track,allow_pickle=False) as data:
+                        keep=data['keep'].astype(bool)
+                        maps[side]={'points':data['tr'][0,keep],'labels':data['labels'][keep]}
+                candidate_frames=sorted((run/'frames'/'candidate').glob('*.jpg'))
+                if candidate_frames:
+                    inspection_map(candidate_frames[0],configs['candidate'],diagnosis,run/'visuals'/'inspection_roi.png',evidence=evidence,maps=maps)
+                result=json.loads((run/'result.json').read_text(encoding='utf-8'))
+                artifacts=sorted((run/'visuals').glob('heatmap_*.png'))
+                if spectrum is not None:artifacts.append(spectrum)
+                if (run/'visuals'/'inspection_roi.png').is_file():artifacts.append(run/'visuals'/'inspection_roi.png')
+                reports(run,diagnosis,evidence,artifacts,result.get('mode','offline_synthetic'),decision=json.loads((run/'decision.json').read_text(encoding='utf-8')))
+            except Exception:
+                # Keep the previous saved result usable if a legacy job lacks inputs for a new visual.
+                pass
+            demo_meta={**source,'id':demo_id,'is_demo':True,'demo_source_job_id':source['id'],
+                'inputs':{'normal':{**source.get('inputs',{}).get('normal',{}),'filename':'데모 정상 영상'},
+                          'candidate':{**source.get('inputs',{}).get('candidate',{}),'filename':'데모 점검 영상'}}}
+            (demo_dir/'job.json').write_text(json.dumps(demo_meta,ensure_ascii=False,indent=2),encoding='utf-8')
+        except Exception:
+            shutil.rmtree(demo_dir,ignore_errors=True)
+            raise
+        return demo_id
+
+    @app.get('/demo')
+    def demo():
+        return RedirectResponse(f'/jobs/{ensure_demo_job()}',status_code=303)
+
     @app.get('/jobs/{job_id}', response_class=HTMLResponse)
     def job_page(job_id: str):
         store.dir(job_id)
@@ -264,7 +342,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
 
     @app.get('/api/jobs')
     def jobs():
-        return [{k: m.get(k) for k in ('id', 'created_at', 'state', 'stage', 'inputs')} | {'label': (m.get('decision') or {}).get('label')} for m in store.all()[:30]]
+        return [{k: m.get(k) for k in ('id', 'created_at', 'state', 'stage', 'inputs')} | {'label': (m.get('decision') or {}).get('label')} for m in store.all() if not m.get('is_demo')][:30]
 
     @app.post('/api/jobs')
     def create_job(normal: UploadFile = File(...), candidate: UploadFile = File(...), capture_fps: float = Form(240.0),
@@ -303,6 +381,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
     def job(job_id: str):
         d = store.dir(job_id); meta = store.read(job_id)
         meta['queue_position'] = sum(1 for m in store.all() if m.get('state') == 'queued' and m['id'] < job_id) if meta['state'] == 'queued' else None
+        meta['is_demo'] = bool(meta.get('is_demo'))
         if meta['state'] == 'done':
             meta['results'] = build_results(d / 'run')
         return meta
