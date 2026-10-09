@@ -1,0 +1,27 @@
+{
+  "mode": "full",
+  "provider_kind": "openai",
+  "align_candidate": true,
+  "frame_count": 3,
+  "roi_repair_attempts": 1,
+  "diagnosis_repair_attempts": 1,
+  "bands": [
+    [
+      "low",
+      1,
+      10
+    ],
+    [
+      "higher",
+      10,
+      48
+    ]
+  ],
+  "conditions": {
+    "same_speed_confirmed": false,
+    "fixed_camera_confirmed": false,
+    "capture_fps_verified_by_user": false,
+    "timebase_basis": "120 fps from filenames/container metadata; provisional",
+    "label_semantics": "experimental_condition_only_not_fault"
+  }
+}
