@@ -207,7 +207,67 @@ def reports(directory,diagnosis,evidence,artifacts,mode,decision=None):
     for number,name,label,observation,action in plain:lines+=['',f'{number}. {name}',label,observation,action]
     lines+=number_lines+['',note]
     (out/'diagnosis.txt').write_text('\n'.join(lines),encoding='utf-8')
-    text=f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>흔들림 점검 안내</title><style>
-    *{{box-sizing:border-box}}body{{font-family:system-ui,-apple-system,sans-serif;background:#f5f7fa;color:#253449;margin:0}}main{{max-width:880px;margin:auto;padding:36px 24px}}.label{{color:#687789;font-size:14px}}h1{{font-size:30px;line-height:1.35;margin:12px 0}}.intro{{font-size:18px;line-height:1.7}}.demo{{background:#fff0ce;color:#735211;border-radius:10px;padding:12px 16px;margin:18px 0;font-size:14px}}.layout{{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}}figure{{margin:0;background:#fff;border-radius:16px;padding:12px}}img{{display:block;width:100%;max-height:620px;object-fit:contain}}figcaption{{font-size:13px;color:#687789;line-height:1.6;padding:10px 6px}}.check{{background:#fff;border-radius:14px;padding:20px;display:flex;gap:14px;margin-bottom:14px}}.number{{background:#f56918;color:white;min-width:30px;height:30px;border-radius:50%;text-align:center;line-height:30px;font-weight:700}}h2{{font-size:20px;margin:0 0 16px}}h3{{font-size:19px;margin:2px 0 12px}}p{{line-height:1.7}}.check p{{margin:8px 0}}.action{{font-weight:600}}.note{{font-size:14px;color:#687789;line-height:1.7;margin-top:24px}}footer{{margin-top:20px}}a{{color:#376c96;font-size:14px}}.numbers{{background:#fff;border-radius:14px;padding:20px;margin-top:24px}}table{{border-collapse:collapse;width:100%;font-size:14px}}td,th{{border-bottom:1px solid #e3e8ef;padding:6px 8px;text-align:left}}.rule{{font-size:13px;color:#687789}}@media(max-width:640px){{main{{padding:24px 16px}}h1{{font-size:25px}}.layout{{grid-template-columns:1fr}}img{{max-height:430px}}}}
-    </style></head><body><main><div class="label">영상으로 살펴본 흔들림 · 추측 점검 안내</div><h1>{esc(title)}</h1><p class="intro">{esc(summary)}</p>{banner}<div class="layout">{picture}<section><h2>어디를 확인하면 좋을까요?</h2>{''.join(cards)}{empty}</section></div>{numbers}<p class="note">{esc(note)}</p><footer><a href="diagnosis.txt" download>점검 안내 저장</a></footer></main></body></html>'''
+    import base64
+    logo_path=Path(__file__).resolve().parent/'web'/'static'/'assets'/'prometheus-logo.png'
+    logo_src='data:image/png;base64,'+base64.b64encode(logo_path.read_bytes()).decode('ascii') if logo_path.is_file() else ''
+    layout_class='layout' if picture else 'layout single'
+    verdict_class=(decision or {}).get('label','insufficient')
+    verdict_label=(decision or {}).get('label_ko',title)
+    verdict_ai=DECISION_KO.get((decision or {}).get('model_decision'),'-')
+    verdict_rule=DECISION_KO.get((decision or {}).get('rule_decision'),'-')
+    agreement=(decision or {}).get('agreement')
+    chips=f'<span class="chip">AI 판단: {esc(verdict_ai)}</span><span class="chip">수치 규칙 판단: {esc(verdict_rule)}</span>'
+    if agreement is not None: chips+=f'<span class="chip">{"두 판단 일치" if agreement else "두 판단 불일치"}</span>'
+    reason=f'<p class="note verdict-reason">{esc(decision.get("reason",""))}</p>' if decision and not agreement else ''
+    text=f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f7fb"><title>분석 결과 · Wi-ing Wi-ing</title><style>
+    *{{box-sizing:border-box}}:root{{--bg:#f4f7fb;--surface:#fff;--surface-2:#edf3fb;--text:#24364d;--muted:#687d96;--line:#d6e0ed;--accent:#3478c9;--bad:#c2410c;--bad-bg:#fff1e8;--good:#15803d;--good-bg:#ecfdf3;--unk:#475569;--unk-bg:#eef2f6}}
+    body{{margin:0;background:linear-gradient(180deg,#eaf3ff 0,#f4f7fb 360px);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.6}}
+    .shell{{max-width:1120px;margin:0 auto;padding:24px clamp(18px,4vw,48px) 64px}}
+    .top{{min-height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:20px}}
+    .brand{{display:flex;align-items:center;gap:12px;color:#173555;text-decoration:none;font-size:20px;font-weight:750;letter-spacing:.02em}}
+    .brand img{{height:44px;width:auto}}.brand small{{display:block;margin-top:3px;color:#536f8e;font-size:9px;letter-spacing:.16em}}
+    .tag{{padding:7px 12px;border:1px solid #d7e6f7;border-radius:999px;background:#f1f7ff;color:#3478c9;font-size:11px;font-weight:700;letter-spacing:.08em}}
+    .heading{{margin:40px 0 22px}}.kicker{{color:#536f8e;font-size:12px;font-weight:700;letter-spacing:.14em}}
+    h1{{margin:9px 0;color:#203854;font-size:clamp(34px,5vw,50px);line-height:1.12;letter-spacing:-.04em}}
+    .heading p{{margin:0;color:#627992;font-size:15px}}
+    .card,.verdict{{margin-bottom:18px;border:1px solid #d7e1ed;border-radius:20px;background:#fff;box-shadow:0 14px 40px rgba(42,69,103,.08)}}
+    .card{{padding:clamp(20px,3vw,30px)}}h2{{margin:0 0 16px;color:#243e5c;font-size:20px}}
+    .verdict{{padding:clamp(22px,3vw,32px)}}.verdict.abnormal{{border-color:#f0d4c5;background:#fff6f1}}
+    .verdict.normal{{border-color:#cfe8d9;background:#f2fbf5}}.verdict.insufficient{{background:#f4f8fd}}
+    .eyebrow{{color:#71839a;font-size:13px;font-weight:700}}.big{{margin-top:3px;font-size:clamp(30px,4vw,42px);font-weight:800;letter-spacing:-.04em}}
+    .abnormal .big{{color:var(--bad)}}.normal .big{{color:var(--good)}}.insufficient .big{{color:var(--unk)}}
+    .verdict>p{{margin:8px 0 14px;color:#4f647b;font-size:16px}}.chips{{display:flex;flex-wrap:wrap;gap:8px}}
+    .chip{{padding:5px 11px;border:1px solid #e0e8f2;border-radius:999px;background:#f1f6fc;color:#516780;font-size:12px}}
+    .demo{{margin-bottom:18px;padding:12px 16px;border:1px solid #c8ddf5;border-radius:14px;background:#eff6ff;color:#315b85;font-size:14px}}
+    .section-head{{margin-bottom:18px}}.section-head .kicker{{margin-bottom:4px}}
+    .layout{{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:22px;align-items:start}}
+    figure{{margin:0;padding:12px;border:1px solid #e0e7f0;border-radius:16px;background:#fff}}
+    figure img{{display:block;width:100%;max-height:620px;object-fit:contain;border-radius:10px;background:var(--surface-2)}}
+    figcaption{{padding:8px 3px 2px;color:var(--muted);font-size:13px}}
+    .check{{display:flex;gap:14px;margin-bottom:12px;padding:17px;border:1px solid #e0e7f0;border-radius:15px;background:#fff}}
+    .number{{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#3478c9;color:#fff;font-weight:800}}
+    h3{{margin:1px 0 7px;color:#263e59;font-size:17px}}.label{{color:#687d96;font-size:13px}}
+    .check p{{margin:6px 0;color:#526880}}.action{{color:#285f9d!important;font-weight:650}}
+    .empty{{padding:16px;border-radius:12px;background:#f7faff;color:#687d96}}
+    .numbers{{overflow-x:auto;padding:clamp(20px,3vw,30px);border:1px solid #d7e1ed;border-radius:20px;background:#fff;box-shadow:0 14px 40px rgba(42,69,103,.08);margin-bottom:18px}}.numbers table{{width:100%;border-collapse:collapse;font-size:14px}}
+    .layout.single{{grid-template-columns:1fr}}
+    .numbers th,.numbers td{{padding:9px 8px;border-bottom:1px solid #e0e7f0;text-align:left;vertical-align:top}}
+    .numbers th{{color:#61758e;font-weight:650;font-size:12px}}.numbers .rule{{margin:15px 0 0;color:#687d96;font-size:13px;line-height:1.7}}
+    .note{{color:#687d96;font-size:13px;line-height:1.7}}.report-note{{padding:0 4px}}
+    footer{{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}}
+    a.button{{display:inline-block;padding:9px 14px;border:1px solid #d3dfed;border-radius:10px;background:#f7faff;color:#2869b7;text-decoration:none;font-weight:650}}
+    a.button:hover{{border-color:#9ebce0;background:#edf5ff}}
+    @media(max-width:720px){{.shell{{padding:14px 16px 42px}}.top{{min-height:70px}}.brand{{font-size:17px}}.brand img{{height:38px}}.tag{{font-size:9px}}.heading{{margin:28px 0 18px}}.layout{{grid-template-columns:1fr}}.card,.verdict{{border-radius:16px}}.check{{gap:10px;padding:14px}}footer{{align-items:flex-start;flex-direction:column}}}}
+    </style></head><body><main class="shell">
+    <header class="top"><a class="brand" href="#"><img src="{logo_src}" alt=""><span>Wi-ing Wi-ing<small>GENIUSES, OBVIOUSLY</small></span></a><span class="tag">INSPECTION REPORT</span></header>
+    <section class="heading"><div class="kicker">VIDEO MOTION ANALYSIS</div><h1>분석 결과 보고서</h1><p>기준 영상과 확인 영상을 비교한 점검 결과입니다.</p></section>
+    {banner}
+    <section class="verdict {esc(verdict_class)}"><div class="eyebrow">최종 판단</div><div class="big">{esc(verdict_label)}</div><p>{esc(summary)}</p><div class="chips">{chips}</div>{reason}</section>
+    <section class="card"><div class="section-head"><div class="kicker">INSPECTION GUIDE</div><h2>어디를 확인하면 좋을까요?</h2></div>
+      <div class="{layout_class}">{picture}<div class="checks">{''.join(cards)}{empty}</div></div>
+    </section>
+    {numbers}
+    <p class="note report-note">{esc(note)}</p>
+    <footer><span class="note">Wi-ing Wi-ing · Video Motion Analysis</span><a class="button" href="diagnosis.txt" download>점검 안내 저장</a></footer>
+    </main></body></html>'''
     (out/'report.html').write_text(text,encoding='utf-8')
