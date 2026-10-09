@@ -291,3 +291,75 @@ td.nw, th.nw { white-space: nowrap; }
 #cancel-edit[hidden],#current-reference[hidden] { display:none; }
 .asset-row .edit-equipment { border:0;background:none;padding:8px 0;color:#2869b7;font:inherit;font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap; }
 .asset-row .edit-equipment:hover { color:#174d8c;text-decoration:underline; }
+
+/* Larger text and wind-farm background for the landing screen */
+.hero-backdrop img { height:140%;filter:brightness(1.04) saturate(.88); }
+.hero-backdrop::after { background:linear-gradient(180deg,rgba(246,250,255,.14),rgba(238,246,255,.12) 50%,rgba(229,240,253,.22)); }
+.landing-nav { height:123px; }
+.hero { height:calc(100svh - 171px); }
+.landing-nav .brand { font-size:22.5px;letter-spacing:.035em; }
+.landing-nav .brand-name small { margin-top:7px;font-size:12px; }
+.landing-links { gap:clamp(27px,4.2vw,63px); }
+.landing-links a,.landing-links button { font-size:19.5px; }
+.landing-nav>.hero-cta { gap:24px;padding:16px 27px;min-height:65px;font-size:18px; }
+.landing-nav>.hero-cta span { font-size:24px; }
+.hero .hero-kicker { gap:15px;font-size:13.5px; }
+.hero .status-dot { width:9px;height:9px; }
+.hero h1 { font-size:clamp(81px,12vw,174px); }
+.hero-description { max-width:810px;font-size:21px; }
+.hero-secondary-cta { gap:39px;margin-top:36px;padding:20px 32px;font-size:19.5px; }
+.hero-secondary-cta span { width:35px;height:35px;font-size:24px; }
+.workflow-card { width:min(1080px,calc(100% - 64px));padding:23px 36px 26px; }
+.workflow-heading { gap:18px;margin-bottom:18px;font-size:12px; }
+.workflow-heading span+span { gap:10px; }
+.workflow-heading i { width:9px;height:9px; }
+.workflow-steps { grid-template-columns:1fr 39px 1fr 39px 1fr; }
+.workflow-steps>a { gap:16px; }
+.step-number { width:45px;height:45px;border-radius:13px;font-size:13.5px; }
+.workflow-steps strong { font-size:15px; }
+.workflow-steps small { font-size:12px; }
+.workflow-steps>a>b { font-size:19.5px; }
+.workflow-connector { min-width:20px; }
+
+@media (max-width:900px) {
+  .landing-nav { height:153px; }
+  .landing-links { gap:clamp(20px,4vw,42px); }
+  .hero { height:calc(100svh - 189px); }
+  .hero-copy { top:31%; }
+  .hero h1 { font-size:clamp(72px,12vw,120px); }
+  .workflow-card { width:calc(100% - 40px);bottom:18px;padding:18px 24px 20px; }
+  .workflow-steps { grid-template-columns:1fr 22px 1fr 22px 1fr; }
+  .workflow-steps>a { gap:10px; }
+  .workflow-steps>a>b { display:none; }
+  .step-number { width:34px;height:34px;font-size:11px; }
+  .workflow-steps strong { overflow:visible;font-size:13px;white-space:normal;text-overflow:clip; }
+  .workflow-steps small { overflow:visible;font-size:11px;white-space:normal;text-overflow:clip; }
+}
+@media (max-width:620px) {
+  .hero-backdrop img { height:140%;object-position:center top; }
+  .landing-nav { height:162px;gap:6px 9px;padding:0 15px; }
+  .landing-nav .brand { font-size:18px; }
+  .landing-nav .brand-name small { margin-top:5px;font-size:9px; }
+  .landing-nav>.hero-cta { min-height:54px;padding:13px 16px;gap:12px;font-size:13.5px; }
+  .landing-nav>.hero-cta span { font-size:18px; }
+  .landing-links { gap:6px;padding:2px 0 11px; }
+  .landing-links a,.landing-links button { font-size:13.5px; }
+  .hero { height:calc(100svh - 182px);min-height:660px; }
+  .hero-copy { top:32%;padding:0 12px; }
+  .hero .hero-kicker { gap:8px;font-size:9px;letter-spacing:.12em; }
+  .hero .status-dot { width:6px;height:6px; }
+  .hero h1 { margin:17px 0 14px;font-size:clamp(52px,13.5vw,78px); }
+  .hero-description { max-width:355px;font-size:16px; }
+  .hero-secondary-cta { gap:24px;margin-top:24px;padding:15px 24px;font-size:15px; }
+  .hero-secondary-cta span { width:27px;height:27px;font-size:18px; }
+  .workflow-card { width:calc(100% - 24px);bottom:12px;padding:15px 16px 17px; }
+  .workflow-heading { gap:8px;margin-bottom:11px;font-size:9px;letter-spacing:.1em; }
+  .workflow-heading span+span { font-size:8px; }
+  .workflow-heading i { width:7px;height:7px; }
+  .workflow-steps { grid-template-columns:1fr;gap:11px; }
+  .workflow-steps>a { gap:12px; }
+  .workflow-connector { display:none; }
+  .step-number { width:35px;height:35px;border-radius:10px;font-size:10px; }
+  .workflow-steps strong { font-size:10.5px; }
+  .workflow-steps small { font-size:9px; }
+}
