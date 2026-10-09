@@ -58,4 +58,5 @@
 |---|---|---|
 | 2026-10-09 (해커톤 기간) | 기존 웹 앱에 완료된 작업별 ZIP 다운로드를 추가함. `job.json`과 분석 결과를 담고 업로드 원본 영상·추출 프레임은 제외함. | `28be090` (`Add downloadable shared analysis records`), `devday/web/app.py`, `devday/web/static/job.html` |
 | 2026-10-09 (해커톤 기간) | Mac self-hosted runner에서 `main` push 자동 배포, `launchd` 앱·터널 서비스, 로컬 접속 코드 보관, 안전한 앱 재시작을 구성하고 팀 배포 절차를 문서화함. | `44bca3e`, `6b8e70b`, `72754ef`, `57a72ae`; `.github/workflows/deploy-mac.yml`, `deploy_mac.sh`, `launchd/`, `README.md` |
+| 2026-10-09 (해커톤 기간) | 결과 화면에 정상·점검 영상의 ROI별 주파수 스펙트럼 비교를 추가하고, 측정 규칙상 증가한 부위와 AI 추가 점검 후보를 구분해 영상에 표시함. 이는 화면 움직임을 시각화하며 물리 단위 진동이나 고장 위치를 확정하지 않음. | `ac149e5` (`Add vibration spectrum and location visuals`), `devday/render.py`, `devday/workflow.py`, `devday/web/` |
 |  |  |  |
