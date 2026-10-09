@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devday-video-diagnosis"
+version = "0.2.0"
+description = "UI-independent API -> video measurement -> API inspection pipeline"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3", "scipy>=1.10,<2", "opencv-python-headless>=4.8,<5", "matplotlib>=3.7,<4", "pydantic>=2.8,<3", "openai>=1.68,<3", "anthropic>=1.0,<2", "fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9"]
+
+[project.scripts]
+devday = "devday.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["devday*"]
+
+[tool.setuptools.package-data]
+devday = ["prompts/*.txt", "web/static/*"]

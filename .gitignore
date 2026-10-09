@@ -1,0 +1,11 @@
+__pycache__/
+.DS_Store
+*.pyc
+*.egg-info/
+.venv/
+settings.py
+results/
+input/*
+!input/README.txt
+web_jobs/
+public_url.txt

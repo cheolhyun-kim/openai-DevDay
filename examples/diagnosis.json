@@ -1,0 +1,15 @@
+{
+  "assessment": "inconclusive",
+  "is_abnormal": null,
+  "abnormality_suspected": false,
+  "fault_confirmed": false,
+  "summary": "저장 응답 재생 테스트입니다. 실제 모델 진단 결과가 아닙니다.",
+  "decision_basis": [],
+  "inspection_candidates": [],
+  "limitations": [
+    "Replay fixture; no live model inference."
+  ],
+  "recommended_validation": [
+    "실제 API 및 촬영 데이터로 검증"
+  ]
+}

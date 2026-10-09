@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "BoxOrPolygon": {
+      "additionalProperties": false,
+      "properties": {
+        "shape": {
+          "enum": [
+            "rectangle",
+            "polygon"
+          ],
+          "title": "Shape",
+          "type": "string"
+        },
+        "bounds_xywh": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bounds Xywh"
+        },
+        "points_xy": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Points Xy"
+        }
+      },
+      "required": [
+        "shape",
+        "bounds_xywh",
+        "points_xy"
+      ],
+      "title": "BoxOrPolygon",
+      "type": "object"
+    },
+    "Region": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "part_name": {
+          "title": "Part Name",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "target",
+            "background"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/BoxOrPolygon"
+        },
+        "candidate": {
+          "$ref": "#/$defs/BoxOrPolygon"
+        },
+        "semantic_confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Semantic Confidence",
+          "type": "string"
+        },
+        "caution": {
+          "title": "Caution",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "part_name",
+        "role",
+        "reference",
+        "candidate",
+        "semantic_confidence",
+        "caution"
+      ],
+      "title": "Region",
+      "type": "object"
+    },
+    "RelativePair": {
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "title": "A",
+          "type": "string"
+        },
+        "b": {
+          "title": "B",
+          "type": "string"
+        }
+      },
+      "required": [
+        "a",
+        "b"
+      ],
+      "title": "RelativePair",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "object_name": {
+      "title": "Object Name",
+      "type": "string"
+    },
+    "same_setup_assessment": {
+      "enum": [
+        "consistent",
+        "uncertain",
+        "different"
+      ],
+      "title": "Same Setup Assessment",
+      "type": "string"
+    },
+    "regions": {
+      "items": {
+        "$ref": "#/$defs/Region"
+      },
+      "title": "Regions",
+      "type": "array"
+    },
+    "relative_pairs": {
+      "items": {
+        "$ref": "#/$defs/RelativePair"
+      },
+      "title": "Relative Pairs",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "object_name",
+    "same_setup_assessment",
+    "regions",
+    "relative_pairs",
+    "limitations"
+  ],
+  "title": "ROIPlan",
+  "type": "object"
+}

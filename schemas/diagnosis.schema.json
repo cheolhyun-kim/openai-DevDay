@@ -1,0 +1,164 @@
+{
+  "$defs": {
+    "Citation": {
+      "additionalProperties": false,
+      "description": "One number the model relies on; code checks it against evidence.json.",
+      "properties": {
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "reference_rms_px",
+            "candidate_rms_px",
+            "ratio",
+            "z_score",
+            "reference_snr",
+            "candidate_snr",
+            "snr_ratio"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "metric",
+        "value"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Inspection": {
+      "additionalProperties": false,
+      "properties": {
+        "roi_id": {
+          "title": "Roi Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "alternative_explanations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alternative Explanations",
+          "type": "array"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "roi_id",
+        "reason",
+        "evidence_ids",
+        "confidence",
+        "alternative_explanations",
+        "action"
+      ],
+      "title": "Inspection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assessment": {
+      "enum": [
+        "suspected_abnormal",
+        "no_clear_difference",
+        "inconclusive"
+      ],
+      "title": "Assessment",
+      "type": "string"
+    },
+    "is_abnormal": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Is Abnormal"
+    },
+    "abnormality_suspected": {
+      "title": "Abnormality Suspected",
+      "type": "boolean"
+    },
+    "fault_confirmed": {
+      "title": "Fault Confirmed",
+      "type": "boolean"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "decision_basis": {
+      "items": {
+        "$ref": "#/$defs/Citation"
+      },
+      "title": "Decision Basis",
+      "type": "array"
+    },
+    "inspection_candidates": {
+      "items": {
+        "$ref": "#/$defs/Inspection"
+      },
+      "title": "Inspection Candidates",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "recommended_validation": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Recommended Validation",
+      "type": "array"
+    }
+  },
+  "required": [
+    "assessment",
+    "is_abnormal",
+    "abnormality_suspected",
+    "fault_confirmed",
+    "summary",
+    "decision_basis",
+    "inspection_candidates",
+    "limitations",
+    "recommended_validation"
+  ],
+  "title": "Diagnosis",
+  "type": "object"
+}

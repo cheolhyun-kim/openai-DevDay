@@ -1,0 +1,11 @@
+{
+  "unit_tests": "38 passed on 2026-10-08 (22 original + 16 review-fix tests: SNR/noise floor, rule pre-filter, citations, guardrail, registration, flicker exclusion, diagnosis repair, strict diagnosis schema via SDK)",
+  "sdk_transport": "Actual OpenAI SDK 2.54.0 with httpx mock transport; strict schema and images serialized; no external model request",
+  "real_video_replay": "Both KakaoTalk 40-51/40-37 files processed with previous reviewed ROI fixture; base low ratio2.221; neck/base-edge excluded",
+  "synthetic_demo": "Known23.4Hz target with camera shake recovered; two provider stages; report output verified",
+  "live_api_inference": "One user-run paired fan-video experiment completed on 2026-10-08 with gpt-6-luna: ROI -> tracking repair -> measurements -> diagnosis, two inspection candidates. This validates integration, not diagnosis accuracy.",
+  "api_model_default": "gpt-6-luna configurable (DEVDAY_MODEL or settings MODEL)",
+  "source_origin": "Existing fan-video-vibration measurement core copied under vendor with tracks export",
+  "shared_settings_template_model": "gpt-6-luna",
+  "real_video_replay_review_fixes": "Stand fan rear view weak(normal slot) vs strong(candidate): iPhone VFR resampled (26-27% missing frames), registration scale 1.0005 rot 0.016deg, background floor 9.6/8.7 mpx (10-96 Hz), target SNR 1.7-5, no rule increase -> rule decision normal; guard ROI flagged by flicker and excluded"
+}

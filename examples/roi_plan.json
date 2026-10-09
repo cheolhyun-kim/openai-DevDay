@@ -1,0 +1,64 @@
+{
+  "object_name": "합성 측정 대상",
+  "same_setup_assessment": "consistent",
+  "regions": [
+    {
+      "id": "head",
+      "part_name": "합성 본체",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.328125,
+          0.3125,
+          0.34375,
+          0.375
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.328125,
+          0.3125,
+          0.34375,
+          0.375
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Synthetic fixture, not object recognition."
+    },
+    {
+      "id": "background_left",
+      "part_name": "고정 배경",
+      "role": "background",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.015625,
+          0.020833333333333332,
+          0.234375,
+          0.9583333333333334
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.015625,
+          0.020833333333333332,
+          0.234375,
+          0.9583333333333334
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": ""
+    }
+  ],
+  "relative_pairs": [],
+  "limitations": [
+    "Synthetic offline fixture."
+  ]
+}

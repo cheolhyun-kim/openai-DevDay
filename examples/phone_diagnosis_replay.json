@@ -1,0 +1,30 @@
+{
+  "assessment": "inconclusive",
+  "is_abnormal": null,
+  "abnormality_suspected": false,
+  "fault_confirmed": false,
+  "summary": "이 응답은 저장된 오프라인 진단 예시입니다. 받침대 주변 저주파 움직임 차이를 점검 후보로 제안합니다.",
+  "decision_basis": [],
+  "inspection_candidates": [
+    {
+      "roi_id": "base_controls",
+      "reason": "측정 데이터의 base_controls:low 비교를 확인하세요. 실제 API 판독 결과가 아닙니다.",
+      "evidence_ids": [
+        "base_controls:low"
+      ],
+      "confidence": "low",
+      "alternative_explanations": [
+        "카메라·원근·추적오차",
+        "풍속 차이"
+      ],
+      "action": "받침대 설치 및 지지 구조의 고정 상태 점검"
+    }
+  ],
+  "limitations": [
+    "Replay fixture; not live model inference.",
+    "원인 위치와 고장 여부 미확정."
+  ],
+  "recommended_validation": [
+    "동일 조건에서 반복 촬영"
+  ]
+}
