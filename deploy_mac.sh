@@ -72,11 +72,12 @@ fi
 
 if ! launchctl print "$LAUNCH_DOMAIN/$TUNNEL_LABEL" >/dev/null 2>&1; then
   : > "$LOG_DIR/tunnel.log"
+  : > "$LOG_DIR/tunnel.error.log"
   launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"
 fi
 
 for _ in {1..30}; do
-  tunnel_url="$(grep -Eo 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG_DIR/tunnel.log" | tail -n 1 || true)"
+  tunnel_url="$(grep -Eho 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG_DIR/tunnel.log" "$LOG_DIR/tunnel.error.log" 2>/dev/null | tail -n 1 || true)"
   if [[ -n "$tunnel_url" ]]; then
     printf '%s\n' "$tunnel_url" > "$TUNNEL_URL_FILE"
     echo "External URL: $tunnel_url"
@@ -87,4 +88,5 @@ done
 
 echo "Tunnel did not become ready. Recent tunnel log:"
 tail -n 80 "$LOG_DIR/tunnel.log"
+tail -n 80 "$LOG_DIR/tunnel.error.log"
 exit 1
