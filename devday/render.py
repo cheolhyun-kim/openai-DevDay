@@ -119,8 +119,9 @@ def spectrum_comparison(directory, measurement_dirs, regions, alignment, bands):
     return path
 
 def display_candidates(diagnosis):
-    """Preserve provider priority order and show at most five candidates."""
-    return diagnosis.inspection_candidates[:5]
+    """Preserve provider priority order; the report shows at most three."""
+    return diagnosis.inspection_candidates[:3]
+
 
 def inspection_map(frame,config,diagnosis,path,evidence=None,maps=None):
     im=cv2.imread(str(frame))
@@ -275,3 +276,7 @@ def reports(directory,diagnosis,evidence,artifacts,mode,decision=None):
     <footer><span class="note">Wi-ing Wi-ing · Video Motion Analysis</span><a class="button" href="diagnosis.txt" download>점검 안내 저장</a></footer>
     </main></body></html>'''
     (out/'report.html').write_text(text,encoding='utf-8')
+
+
+# Keep the standalone report renderer isolated from the legacy chart helpers.
+from .report_v2 import reports

@@ -108,6 +108,10 @@ figcaption { color: var(--muted); font-size: 13px; padding: 6px 2px; }
 .kv dd { margin: 0; }
 ul.plain { margin: 6px 0; padding-left: 20px; }
 details summary { cursor: pointer; font-weight: 600; }
+details.card { padding: 0; overflow: hidden; }
+details.card > summary { padding: 18px 22px; }
+details.card[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+.detail-content { padding: 0 22px 22px; }
 .links a { margin-right: 14px; font-size: 14px; }
 .download { display: inline-block; padding: 8px 12px; border: 1px solid var(--line); border-radius: 9px; text-decoration: none; font-weight: 650; }
 .scroll table { min-width: 620px; }

@@ -576,7 +576,8 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
                 artifacts=sorted((run/'visuals').glob('heatmap_*.png'))
                 if spectrum is not None:artifacts.append(spectrum)
                 if (run/'visuals'/'inspection_roi.png').is_file():artifacts.append(run/'visuals'/'inspection_roi.png')
-                reports(run,diagnosis,evidence,artifacts,result.get('mode','offline_synthetic'),decision=json.loads((run/'decision.json').read_text(encoding='utf-8')))
+                reports(run,diagnosis,evidence,artifacts,result.get('mode','offline_synthetic'),
+                    decision=json.loads((run/'decision.json').read_text(encoding='utf-8')))
             except Exception:
                 # Keep the previous saved result usable if a legacy job lacks inputs for a new visual.
                 pass
