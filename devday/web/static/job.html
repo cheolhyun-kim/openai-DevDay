@@ -130,10 +130,12 @@ function infoCard(r) {
 }
 
 function galleryCard(r) {
-  const imgs = r.images.filter(i => !['visuals/inspection_roi.png','visuals/spectrum_comparison.png'].includes(i.path));
-  if (!imgs.length) return '';
-  const figures = imgs.map(i => `<figure class="${i.path.includes('heatmap') ? 'wide' : ''}"><a href="${fileUrl(i.path)}" target="_blank"><img src="${fileUrl(i.path)}" alt="${esc(i.title)}" loading="lazy"></a><figcaption>${esc(i.title)}</figcaption></figure>`).join('');
-  return `<section class="card"><h2>측정 화면</h2><p class="note">각 지도는 왼쪽부터 기준 영상(Reference), 확인 영상(Candidate), 두 영상의 차이입니다. 기준·확인 지도는 같은 색상 범위를 사용하며 파랑에서 노랑으로 밝아질수록 움직임이 큽니다. 차이 지도는 파랑이 감소, 빨강이 증가입니다. 회색 X는 판정에서 제외한 지점입니다. low는 낮은 주파수 대역의 느린 흔들림, higher는 높은 대역의 빠른 떨림을 뜻합니다. 각 지도 제목에서 정확한 Hz 범위를 확인하세요. 색은 고장 확률이 아니라 화면 움직임(px RMS)입니다.</p><div class="gallery">${figures}</div></section>`;
+  const parts = r.images.filter(i => i.path.startsWith('measurements/') && i.path.endsWith('/roi.png'));
+  const maps = r.images.filter(i => i.path.includes('heatmap'));
+  const figures = list => list.map(i => `<figure class="${i.path.includes('heatmap') ? 'wide' : ''}"><a href="${fileUrl(i.path)}" target="_blank"><img src="${fileUrl(i.path)}" alt="${esc(i.title)}" loading="lazy"></a><figcaption>${esc(i.title)}</figcaption></figure>`).join('');
+  const partsCard = parts.length ? `<section class="card"><h2>측정 부위</h2><p class="note">정상 영상과 확인 영상에서 분석에 사용한 부위(ROI)를 보여줍니다. 두 영상에서 같은 물리적 부위가 선택됐는지, 측정 영역이 배경이나 움직이는 부품을 지나치게 포함하지 않았는지 확인하세요.</p><div class="gallery">${figures(parts)}</div></section>` : '';
+  const mapsCard = maps.length ? `<section class="card"><h2>측정 지도</h2><p class="note">각 지도는 왼쪽부터 기준 영상(Reference), 확인 영상(Candidate), 두 영상의 차이입니다. 기준·확인 지도는 같은 색상 범위를 사용하며 파랑에서 노랑으로 밝아질수록 측정된 흔들림이 큽니다. 차이 지도는 파랑이 감소, 빨강이 증가입니다. 회색 X는 판정에서 제외한 지점입니다. 낮은 주파수 대역은 느린 흔들림, 높은 대역은 빠른 떨림을 보여줍니다. 정확한 Hz 범위는 각 지도 제목을 확인하세요. 색은 고장 확률이 아니라 화면 움직임(px RMS)입니다.</p><div class="gallery">${figures(maps)}</div></section>` : '';
+  return partsCard + mapsCard;
 }
 
 async function poll() {
