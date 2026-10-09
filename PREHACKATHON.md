@@ -65,4 +65,5 @@
 | 2026-10-09 (해커톤 기간) | 진한 파란 패널을 밝고 투명한 스타일로 바꾸고, 브랜드명을 Wi-ing Wi-ing으로 변경함. 랜딩과 기능 화면의 심볼 로고를 제거함. | `52030f0` (`Remove navy hero and rename Wi-ing Wi-ing`), `devday/web/static/` |
 | 2026-10-09 (해커톤 기간) | 등록 장비 목록에서 Inspect 대신 Edit를 제공함. 기존 등록 폼에 장비명·모델·기준 영상·촬영 FPS를 불러와 수정하도록 하고, 기준 영상을 유지하거나 교체할 수 있는 장비 수정 API를 추가함. | `e936082` (`Allow editing registered equipment`), `devday/web/app.py`, `devday/web/static/equipment.html` |
 | 2026-10-09 (해커톤 기간) | 팀이 제공한 풍력발전 사진으로 랜딩 배경을 바꾸고 상단 메뉴·브랜드·중앙 안내·하단 단계 카드의 글씨를 키움. 좁은 화면에서는 안내 단계를 세로로 배치하고 태블릿 화면의 문구 잘림을 조정함. | `89e63bb` (`Use wind farm hero and enlarge landing text`), `devday/web/static/index.html`, `devday/web/static/style.css`, `devday/web/static/assets/wind-farm-background.jpg` |
+| 2026-10-09 (해커톤 기간) | 랜딩 상단의 중복 진단 버튼을 제거하고 제목 크기를 줄였으며, 브랜드 한 줄 문구를 `GENIUSES, OBVIOUSLY`로 변경함. 배경은 화면을 채우도록 조정하고 모바일에서는 전체 와이드 사진을 보이면서 사진 배경이 화면 가장자리까지 이어지게 구성함. 320px·390px 모바일 화면에서 메뉴, 진단 버튼, 안내 카드를 직접 확인함. | `2d752ec` (`Refine landing hero and mobile layout`), `devday/web/static/index.html`, `devday/web/static/style.css` |
 |  |  |  |
