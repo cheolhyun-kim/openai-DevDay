@@ -17,6 +17,7 @@ from scipy.signal import welch
 LABELS={'suspected_abnormal':'이상 의심','no_clear_difference':'뚜렷한 차이 없음','inconclusive':'측정·판단 불충분'}
 LIVE_MODES={'openai_live','claude_live'}
 DECISION_KO={'abnormal':'비정상','normal':'정상','insufficient':'판단 불가'}
+HEATMAP_RENDER_VERSION='2'
 
 def _korean_font():
     """Choose a Korean-capable font when the host has one; charts still work otherwise."""
@@ -38,6 +39,7 @@ def _english_roi_name(roi_id):
 
 
 def heatmaps(directory,frame_paths,maps,evidence,bands):
+    korean_font=_korean_font()
     directory=Path(directory);directory.mkdir(exist_ok=True);paths=[]
     for bn,lo,hi in bands:
         rows={r['roi_id']:r for r in evidence['region_comparisons'] if r['evidence_id'].endswith(':'+bn)}
@@ -60,15 +62,17 @@ def heatmaps(directory,frame_paths,maps,evidence,bands):
                 v=m['band_values'][bn];color=v[good] if v is not None else np.zeros(good.sum())
             if good.any():
                 sc=ax.scatter(xy[good,0],xy[good,1],c=color,s=23,cmap='coolwarm' if difference else 'turbo',vmin=-dmax if difference else 0,vmax=dmax if difference else vmax,edgecolors='black',linewidths=.2)
-                fig.colorbar(sc,ax=ax,shrink=.5,label='움직임 차이 (px RMS)' if difference else '움직임 크기 (px RMS)')
+                colorbar_label = ('움직임 차이 (px RMS)' if difference else '움직임 크기 (px RMS)') if korean_font else ('Motion difference (px RMS)' if difference else 'Motion magnitude (px RMS)')
+                fig.colorbar(sc,ax=ax,shrink=.5,label=colorbar_label)
             for name in rows:
                 sel=labels==name
                 if sel.any():
-                    x,y=np.median(xy[sel],axis=0);ax.text(x,y,name,fontsize=7,bbox={'facecolor':'white','alpha':.8,'edgecolor':'none'})
-            title='확인 영상 - 기준 영상 (부위별 차이)' if difference else ('기준 영상' if side=='reference' else '확인 영상')
+                    x,y=np.median(xy[sel],axis=0);display_name=name if korean_font else _english_roi_name(name);ax.text(x,y,display_name,fontsize=7,bbox={'facecolor':'white','alpha':.8,'edgecolor':'none'})
+            title=('확인 영상 - 기준 영상 (부위별 차이)' if difference else ('기준 영상' if side=='reference' else '확인 영상')) if korean_font else ('Candidate − reference (regional difference)' if difference else ('Reference' if side=='reference' else 'Candidate'))
             ax.set_title(title);ax.axis('off')
-        fig.suptitle(f'{lo:g}–{hi:g} Hz 대역별 화면 흔들림 · 회색 X: 판정 제외 · 고장 확률 아님')
-        path=directory/f'heatmap_{bn}.png';fig.savefig(path,dpi=140);plt.close(fig);paths.append(path)
+        chart_title=f'{lo:g}–{hi:g} Hz 대역별 화면 흔들림 · 회색 X: 판정 제외 · 고장 확률 아님' if korean_font else f'{lo:g}–{hi:g} Hz band · image motion · gray X: excluded · not a failure probability'
+        fig.suptitle(chart_title)
+        path=directory/f'heatmap_{bn}.png';fig.savefig(path,dpi=140,metadata={'Title':f'DevDay measurement map v{HEATMAP_RENDER_VERSION}'});plt.close(fig);paths.append(path)
     return paths
 
 def spectrum_comparison(directory, measurement_dirs, regions, alignment, bands):

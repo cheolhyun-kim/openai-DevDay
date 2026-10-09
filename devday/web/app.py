@@ -10,6 +10,7 @@ import os
 import re
 import secrets
 import shutil
+import tempfile
 import threading
 import time
 import uuid
@@ -41,6 +42,71 @@ METRIC_KO = {'reference_rms_px': '정상 영상 흔들림', 'candidate_rms_px': 
              'snr_ratio': '신호/잡음 배율'}
 FLAG_KO = {'increase': '증가 기준 충족', 'decrease': '감소', 'no_significant_change': '유의한 변화 없음',
            'below_noise_floor': '배경 잡음 수준', 'not_measurable': '측정 불가'}
+_HEATMAP_MIGRATION_LOCK = threading.Lock()
+
+
+def _refresh_stored_heatmaps(run):
+    """Re-render old map images once their PNG renderer version is outdated."""
+    run = Path(run)
+    visuals = run / 'visuals'
+    existing = sorted(visuals.glob('heatmap_*.png'))
+    if not existing:
+        return
+    from ..render import HEATMAP_RENDER_VERSION
+    version_tag = f'DevDay measurement map v{HEATMAP_RENDER_VERSION}'.encode()
+    if all(version_tag in image.read_bytes() for image in existing):
+        return
+
+    with _HEATMAP_MIGRATION_LOCK:
+        existing = sorted(visuals.glob('heatmap_*.png'))
+        if not existing or all(version_tag in image.read_bytes() for image in existing):
+            return
+        try:
+            import numpy as np
+            from ..measurement import band_rms
+            from ..render import heatmaps
+
+            evidence = json.loads((run / 'evidence.json').read_text(encoding='utf-8'))
+            configs = json.loads((run / 'configs.json').read_text(encoding='utf-8'))
+            bands_by_id = {}
+            for row in evidence.get('region_comparisons', []):
+                band_id = row['evidence_id'].rsplit(':', 1)[-1]
+                hz = row.get('band_hz') or []
+                if len(hz) == 2:
+                    bands_by_id.setdefault(band_id, (band_id, float(hz[0]), float(hz[1])))
+            bands = list(bands_by_id.values())
+            maps = {}
+            frame_paths = {}
+            for side in ('reference', 'candidate'):
+                track_path = run / 'measurements' / side / 'tracks.npz'
+                frames = sorted((run / 'frames' / side).glob('*.jpg'))
+                if not track_path.is_file() or not frames:
+                    return
+                frame_paths[side] = str(frames[0])
+                with np.load(track_path, allow_pickle=False) as data:
+                    keep = data['keep'].astype(bool)
+                    tracks = data['tr'][:, keep]
+                    labels = data['labels'][keep]
+                if not len(tracks) or len(tracks[0]) != len(labels):
+                    return
+                raw = tracks - tracks[0]
+                background_ids = [roi['id'] for roi in configs[side]['rois'] if roi['role'] == 'background']
+                background = np.isin(labels, background_ids)
+                if not background.any():
+                    return
+                compensated = raw - np.median(raw[:, background], axis=1)[:, None, :]
+                fps = float(configs[side]['capture_fps'])
+                nperseg = int(configs[side].get('nperseg') or 512)
+                band_values = {name: band_rms(compensated, fps, lo, hi, nperseg) for name, lo, hi in bands}
+                maps[side] = {'points': tracks[0], 'labels': labels, 'band_values': band_values}
+
+            with tempfile.TemporaryDirectory(prefix='.heatmap-refresh-', dir=visuals) as temp_dir:
+                rendered = heatmaps(temp_dir, frame_paths, maps, evidence, bands)
+                for image in rendered:
+                    image.replace(visuals / image.name)
+        except Exception:
+            # A missing legacy artifact should never make a saved result inaccessible.
+            return
 
 
 def now():
@@ -127,6 +193,7 @@ def friendly_error(exc):
 def build_results(run_dir):
     """Flatten pipeline outputs into one payload for the results page."""
     run = Path(run_dir)
+    _refresh_stored_heatmaps(run)
     load = lambda name: json.loads((run / name).read_text(encoding='utf-8')) if (run / name).is_file() else None
     evidence = load('evidence.json') or {}; decision = load('decision.json'); diagnosis = load('diagnosis.json')
     result = load('result.json') or {}; alignment = load('alignment.json') or {}
@@ -163,18 +230,23 @@ def build_results(run_dir):
                 for side, m in measurements.items()}
     reg = alignment.get('registration') or {}
     images = []
+    def add_image(rel, title):
+        path = run / rel
+        if path.is_file():
+            images.append({'path': rel, 'title': title, 'version': path.stat().st_mtime_ns})
+
     for rel, title in [('visuals/inspection_roi.png', '확인해볼 위치'), ('measurements/reference/roi.png', '정상 영상 측정 부위'),
                        ('measurements/candidate/roi.png', '점검 영상 측정 부위')]:
-        if (run / rel).is_file(): images.append({'path': rel, 'title': title})
+        add_image(rel, title)
     for p in sorted((run / 'visuals').glob('heatmap_*.png')):
         band_id = p.stem.replace('heatmap_', '')
         row = next((x for x in evidence.get('region_comparisons', []) if x['evidence_id'].endswith(':' + band_id)), {})
         hz = row.get('band_hz') or []
         label = '낮은 주파수' if band_id in ('low', 'lower') else '높은 주파수' if band_id in ('higher', 'high') else f'{band_id} 대역'
         span = f' · {hz[0]:g}–{hz[1]:g} Hz' if len(hz) == 2 else ''
-        images.append({'path': f'visuals/{p.name}', 'title': f'흔들림 지도 · {label}{span}'})
+        add_image(f'visuals/{p.name}', f'흔들림 지도 · {label}{span}')
     if (run / 'visuals/spectrum_comparison.png').is_file():
-        images.append({'path': 'visuals/spectrum_comparison.png', 'title': '주파수별 흔들림 비교'})
+        add_image('visuals/spectrum_comparison.png', '주파수별 흔들림 비교')
     usage = [{'stage': c.get('stage'), 'model': c.get('model'), 'usage': c.get('usage')} for c in result.get('model_calls', [])]
     return {'decision': decision, 'summary': (diagnosis or {}).get('summary'), 'limitations': (diagnosis or {}).get('limitations', []),
             'recommended_validation': (diagnosis or {}).get('recommended_validation', []), 'cited': cited, 'table': table,
