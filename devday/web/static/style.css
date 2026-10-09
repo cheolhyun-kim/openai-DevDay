@@ -283,3 +283,11 @@ td.nw, th.nw { white-space: nowrap; }
 .asset-copy span,.history-copy span { color:#61758e; }
 .check-option { color:#526880!important; }
 .check-option input { accent-color:#3478c9; }
+.form-actions { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+.form-cancel { padding:11px 16px;border:1px solid #cbd7e5;border-radius:999px;background:#fff;color:#49617a;font:inherit;font-size:12px;font-weight:650;cursor:pointer; }
+.form-cancel:hover { background:#f3f7fc;border-color:#9eb6d2; }
+.form-cancel:disabled { opacity:.5;cursor:not-allowed; }
+.current-reference { color:#3478c9!important;font-weight:600; }
+#cancel-edit[hidden],#current-reference[hidden] { display:none; }
+.asset-row .edit-equipment { border:0;background:none;padding:8px 0;color:#2869b7;font:inherit;font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap; }
+.asset-row .edit-equipment:hover { color:#174d8c;text-decoration:underline; }

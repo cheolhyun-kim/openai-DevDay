@@ -17,6 +17,7 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import cv2
 from urllib.parse import quote
@@ -332,6 +333,54 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
         except Exception:
             shutil.rmtree(folder,ignore_errors=True)
             raise
+
+    @app.put('/api/equipment/{equipment_id}')
+    def update_equipment(equipment_id: str, name: str = Form(...), model: str = Form(''),
+                         capture_fps: float = Form(240.0), normal: Optional[UploadFile] = File(None)):
+        folder=equipment_dir(equipment_id)
+        metadata_path=folder/'equipment.json'
+        item=json.loads(metadata_path.read_text(encoding='utf-8'))
+        name=name.strip();model=model.strip()
+        if not name or len(name)>80 or len(model)>120:
+            raise HTTPException(400,'Enter an equipment name (up to 80 characters) and a model up to 120 characters.')
+        if not (1<=capture_fps<=10000):
+            raise HTTPException(400,'Capture FPS must be between 1 and 10000.')
+
+        current_normal=item.get('normal') or {}
+        current_name=Path(current_normal.get('stored','')).name
+        current_path=(folder/current_name).resolve()
+        if not current_name or folder.resolve() not in current_path.parents or not current_path.is_file():
+            raise HTTPException(400,'The saved healthy reference video is missing. Upload a replacement video.')
+
+        new_video_path=None
+        if normal and normal.filename:
+            suffix=Path(normal.filename).suffix.lower()
+            if suffix not in VIDEO_EXT:
+                raise HTTPException(400,'Upload a .mov, .mp4, .m4v, or .avi video.')
+            new_video_path=folder/f'reference_{uuid.uuid4().hex[:12]}{suffix}'
+            limit=min(max_upload_mb,int((provider_info or {}).get('max_request_mb') or max_upload_mb))
+            try:
+                reference,warnings=save_video(normal,new_video_path,limit,capture_fps)
+                item['normal']=reference
+                item['warnings']=warnings
+            except Exception:
+                new_video_path.unlink(missing_ok=True)
+                raise
+        else:
+            _,warnings=probe(current_path,capture_fps)
+            item['warnings']=warnings
+
+        item.update({'name':name,'model':model,'capture_fps':capture_fps,'updated_at':now()})
+        tmp_path=folder/f'equipment.{uuid.uuid4().hex}.tmp'
+        try:
+            tmp_path.write_text(json.dumps(item,ensure_ascii=False,indent=2),encoding='utf-8')
+            tmp_path.replace(metadata_path)
+        except Exception:
+            tmp_path.unlink(missing_ok=True)
+            if new_video_path:
+                new_video_path.unlink(missing_ok=True)
+            raise
+        return item
 
     @app.post('/api/jobs/from-equipment')
     def create_equipment_job(equipment_id: str = Form(...), candidate: UploadFile = File(...),
