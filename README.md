@@ -286,6 +286,13 @@ result = run_pipeline(
 
 코드는 기존 fan-video-vibration 분석 핵심을 `devday/vendor/fanvib`에 복사해 추적 배열 저장만 추가했습니다. 출처: https://github.com/Kongheechul/fan-video-vibration (MIT). 원 저장소/원본 영상은 수정하지 않습니다.
 
+## 외부 구성요소·데이터·모델 출처와 사용 범위
+
+- **기존 코드:** [`Kongheechul/fan-video-vibration`](https://github.com/Kongheechul/fan-video-vibration), MIT. `devday/vendor/fanvib/`에 측정 핵심을 복사해 사용하며, 이 프로젝트에서는 추적 결과 저장 기능을 덧붙였습니다. 원 저장소는 변경하지 않았습니다.
+- **Python 라이브러리:** 직접 의존성과 버전 범위는 [`pyproject.toml`](pyproject.toml), 설치 버전 기록은 [`requirements.lock.txt`](requirements.lock.txt)에 있습니다. [NumPy](https://numpy.org/)·[SciPy](https://scipy.org/)는 배열·신호 처리를, [OpenCV](https://opencv.org/)는 영상 디코딩·프레임 추적·정합을, [Matplotlib](https://matplotlib.org/)는 시각화를, [Pydantic](https://docs.pydantic.dev/)은 모델 입출력 검증을 담당합니다. [OpenAI Python SDK](https://github.com/openai/openai-python)와 [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python)는 선택한 모델 API를 호출합니다. [FastAPI](https://fastapi.tiangolo.com/)·[Uvicorn](https://www.uvicorn.org/)·[python-multipart](https://github.com/Kludex/python-multipart)는 웹 화면, 서버, 영상 업로드에 사용합니다. 각 구성요소의 원 라이선스와 고지는 해당 배포본 및 공식 저장소를 따릅니다.
+- **모델/API:** 사용자가 로컬 `settings.py`에서 공급자와 모델을 선택합니다. 기준 설정의 OpenAI 모델은 `gpt-6-luna`이며 Anthropic 경로도 지원합니다. [OpenAI API](https://developers.openai.com/api/docs/) 또는 [Anthropic API](https://docs.anthropic.com/en/docs/intro-to-claude)를 통해 측정 ROI 제안과 결과 설명에만 사용합니다. 영상 추적·수치 계산은 로컬 코드에서 수행합니다. API에는 대표 프레임·ROI 이미지와 측정 JSON을 보내며, 원본 영상 파일은 전송하지 않습니다.
+- **데이터·템플릿:** 저장소에는 공개 외부 영상 데이터셋이나 제3자 UI 템플릿을 포함하지 않습니다. `examples/*phone*replay.json`은 실제 휴대폰 영상 분석에서 저장한 응답을 오프라인 재생하는 예시이며 원본 영상은 포함하지 않습니다. 나머지 합성 replay 예시는 연결 흐름 시연용입니다. 사용자가 웹에 올린 영상과 `web_jobs/` 실행 결과는 배포 Mac에 저장되며 Git에는 포함되지 않습니다.
+
 ## 검사
 
 ```bash
