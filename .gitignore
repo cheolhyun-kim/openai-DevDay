@@ -10,4 +10,6 @@ input/*
 web_jobs/
 logs/
 .devday_access_code
+.devday_web.pid
+.devday_tunnel.pid
 public_url.txt
