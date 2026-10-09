@@ -166,6 +166,8 @@ def build_results(run_dir):
         if (run / rel).is_file(): images.append({'path': rel, 'title': title})
     for p in sorted((run / 'visuals').glob('heatmap_*.png')):
         images.append({'path': f'visuals/{p.name}', 'title': f'측정 지도 ({p.stem.replace("heatmap_", "")} 대역)'})
+    if (run / 'visuals/spectrum_comparison.png').is_file():
+        images.append({'path': 'visuals/spectrum_comparison.png', 'title': '주파수별 흔들림 비교'})
     usage = [{'stage': c.get('stage'), 'model': c.get('model'), 'usage': c.get('usage')} for c in result.get('model_calls', [])]
     return {'decision': decision, 'summary': (diagnosis or {}).get('summary'), 'limitations': (diagnosis or {}).get('limitations', []),
             'recommended_validation': (diagnosis or {}).get('recommended_validation', []), 'cited': cited, 'table': table,

@@ -11,6 +11,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from .vendor.fanvib.pipeline import roi_mask
+from scipy.signal import welch
 
 LABELS={'suspected_abnormal':'이상 의심','no_clear_difference':'뚜렷한 차이 없음','inconclusive':'측정·판단 불충분'}
 LIVE_MODES={'openai_live','claude_live'}
@@ -49,22 +50,86 @@ def heatmaps(directory,frame_paths,maps,evidence,bands):
         path=directory/f'heatmap_{bn}.png';fig.savefig(path,dpi=140);plt.close(fig);paths.append(path)
     return paths
 
+def spectrum_comparison(directory, measurement_dirs, regions, alignment, bands):
+    """Plot paired Welch spectra from the same tracked target ROIs."""
+    directory=Path(directory); directory.mkdir(parents=True,exist_ok=True)
+    traces=[]
+    for region in regions:
+        roi_id=region['id']; paired=[]
+        for side in ('reference','candidate'):
+            path=Path(measurement_dirs[side])/'signals.npz'
+            if not path.is_file(): break
+            try:
+                with np.load(path) as data:
+                    key=f'{roi_id}__affine'
+                    if key not in data: break
+                    signal=np.asarray(data[key],dtype=float)
+                    fps=float(data['capture_fps'])
+            except (OSError,KeyError,ValueError): break
+            if signal.ndim!=2 or signal.shape[0]<8 or not np.isfinite(signal).all() or fps<=0: break
+            if side=='candidate' and alignment.get('ok') and alignment.get('scale',0)>0:
+                signal=signal/float(alignment['scale'])
+            nperseg=min(512,signal.shape[0])
+            hz,psd=welch(signal,fs=fps,nperseg=nperseg,detrend='linear',axis=0)
+            paired.append((hz,np.maximum(psd.sum(axis=1),1e-16)))
+        if len(paired)==2:
+            traces.append((region['part_name'],paired))
+    if not traces:return None
+    cols=2; rows=(len(traces)+cols-1)//cols
+    fig,axs=plt.subplots(rows,cols,figsize=(13,4.1*rows),squeeze=False,layout='constrained')
+    for ax,(name,paired) in zip(axs.flat,traces):
+        (href,pref),(hcand,pcand)=paired
+        max_hz=min(href[-1],hcand[-1])
+        for i,(_,lo,hi) in enumerate(bands):
+            if lo<max_hz: ax.axvspan(lo,min(hi,max_hz),color='#f0b44d',alpha=.10,zorder=0)
+        ax.semilogy(href,pref,label='Normal',color='#3182bd',linewidth=1.5)
+        ax.semilogy(hcand,pcand,label='Inspection',color='#e45745',linewidth=1.5)
+        ax.set_xlim(0,max_hz);ax.set_title(str(name));ax.set_xlabel('Frequency (Hz)');ax.set_ylabel('Motion PSD (px²/Hz)')
+        ax.grid(True,which='both',alpha=.2)
+    for ax in list(axs.flat)[len(traces):]:ax.remove()
+    handles,labels=axs.flat[0].get_legend_handles_labels()
+    fig.legend(handles,labels,loc='upper center',ncol=2,frameon=False)
+    fig.suptitle('Frequency spectrum comparison · measured image motion',y=1.02,fontsize=15)
+    path=directory/'spectrum_comparison.png';fig.savefig(path,dpi=150,bbox_inches='tight');plt.close(fig)
+    return path
+
 def display_candidates(diagnosis):
     """Preserve provider priority order and show at most five candidates."""
     return diagnosis.inspection_candidates[:5]
 
-def inspection_map(frame,config,diagnosis,path):
+def inspection_map(frame,config,diagnosis,path,evidence=None,maps=None):
     im=cv2.imread(str(frame))
+    if im is None:raise OSError(f'Cannot read inspection frame: {frame}')
     rois={r['id']:r for r in config['rois']}
-    for number,item in enumerate(display_candidates(diagnosis),1):
-        r=rois.get(item.roi_id)
+    evidence=evidence or {};maps=maps or {}
+    rows=[r for r in evidence.get('region_comparisons',[]) if r.get('rule_flag')=='increase' and r.get('eligible_for_interpretation')]
+    rows.sort(key=lambda r:(r.get('ratio') or 0,r.get('z_score') or 0),reverse=True)
+    measured=[]
+    for row in rows:
+        if row['roi_id'] not in measured:measured.append(row['roi_id'])
+    ai=[item.roi_id for item in display_candidates(diagnosis) if item.roi_id not in measured]
+    targets=[(roi_id,'measured') for roi_id in measured]+[(roi_id,'ai') for roi_id in ai]
+    palette={'measured':(45,65,235),'ai':(0,140,255)}
+    candidate_map=maps.get('candidate') or {}
+    xy=np.asarray(candidate_map.get('points',[]));labels=np.asarray(candidate_map.get('labels',[]))
+    number=0
+    for roi_id,kind in targets:
+        r=rois.get(roi_id)
         if r is None:continue
+        number+=1
         mask=roi_mask(im.shape[:2],r)
         contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(im,contours,-1,(0,100,245),3)
+        color=palette[kind]
+        cv2.drawContours(im,contours,-1,color,3)
         ys,xs=np.where(mask);center=(int(xs.mean()),int(ys.mean()))
-        cv2.circle(im,center,22,(0,100,245),-1)
+        cv2.circle(im,center,22,color,-1)
         cv2.putText(im,str(number),(center[0]-8,center[1]+8),cv2.FONT_HERSHEY_SIMPLEX,.7,(255,255,255),2)
+        if len(labels)==len(xy):
+            for point in xy[labels==roi_id]:cv2.circle(im,tuple(np.round(point).astype(int)),3,(230,220,30),-1)
+    # Legend uses English to avoid platform-dependent OpenCV font rendering.
+    legend=[('Measured increase',(45,65,235)),('AI review candidate',(0,140,255)),('Tracked points',(230,220,30))]
+    for i,(text,color) in enumerate(legend):
+        y=28+i*25;cv2.rectangle(im,(10,y-15),(245,y+7),(255,255,255),-1);cv2.circle(im,(22,y-4),6,color,-1);cv2.putText(im,text,(36,y),cv2.FONT_HERSHEY_SIMPLEX,.48,(30,30,30),1,cv2.LINE_AA)
     if not cv2.imwrite(str(path),im):raise OSError('Cannot write inspection overlay')
 
 def reports(directory,diagnosis,evidence,artifacts,mode,decision=None):

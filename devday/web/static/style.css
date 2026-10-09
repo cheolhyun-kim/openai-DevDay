@@ -108,3 +108,5 @@ details summary { cursor: pointer; font-weight: 600; }
 .scroll table { min-width: 620px; }
 td.nw, th.nw { white-space: nowrap; }
 .gallery figure.wide { grid-column: 1 / -1; }
+.spectrum { margin: 0; }
+.spectrum img { display: block; width: 100%; border-radius: 10px; background: var(--surface-2); }
