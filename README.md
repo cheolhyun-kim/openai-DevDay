@@ -23,20 +23,19 @@
 - 분석은 한 번에 하나씩 순서대로 처리하며, 결과는 `web_jobs/<분석 ID>/`에 남습니다. 한 번 분석에 AI 호출은 2번(측정 부위 고르기, 판정)입니다.
 - API 키는 `settings.py`에만 보관하고 공유하거나 커밋하지 마세요. 해당 파일과 입력 영상, 분석 결과는 Git에서 제외됩니다.
 
-## 팀 공동 사용: GitHub push 자동 배포
+## 팀 공동 사용: GitHub push 자동 배포 (맥 호스트)
 
-호스팅은 **Render Web Service + GitHub `main` 브랜치 연결**로 구성합니다. Blueprint는 저장소의 [`render.yaml`](render.yaml)에 있습니다. Render에서 이 저장소를 연결해 Blueprint를 만들면 `main`에 push/merge된 커밋마다 자동으로 배포됩니다. 팀원은 각자 브랜치에서 작업하고 GitHub Pull Request를 `main`에 병합하면 됩니다. Render에서 배포가 완료되면 같은 서비스 URL에 새 버전이 제공됩니다.
+개발 맥에서 앱을 호스팅하고 **GitHub Actions self-hosted runner**로 배포합니다. [`deploy_mac.yml`](.github/workflows/deploy-mac.yml)은 `main` 브랜치에 push될 때만 실행되어 [`deploy_mac.sh`](deploy_mac.sh)가 최신 코드를 받고 앱을 재시작합니다. 팀원은 각자 브랜치에서 작업하고 Pull Request를 `main`에 병합하면 됩니다.
 
 ### 최초 1회 설정
 
-1. Render 계정에서 **New → Blueprint**를 선택하고 `cheolhyun-kim/openai-DevDay` 저장소의 `main` 브랜치를 연결한 뒤 `render.yaml`을 적용합니다.
-2. 비밀 환경 변수 입력란에 `OPENAI_API_KEY`, `DEVDAY_ACCESS_CODE`, `DEVDAY_MODEL` 값을 지정합니다. API 키와 접속 코드는 GitHub 파일이나 커밋에 넣지 않습니다. 접속 코드는 팀 외부와 공유하지 마세요.
-3. 유료 Web Service와 10GB 영구 디스크를 승인하고 생성합니다. 이 앱은 업로드 영상과 분석 결과를 파일로 보관하므로 Render 무료 서비스의 임시 파일 저장소는 맞지 않습니다.
-4. 서비스 URL에서 로그인·영상 업로드·분석을 확인합니다. 이후 `main`에 반영한 push마다 Render가 자동 배포합니다.
+1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 앱 저장소 밖(예: `DevDay-runner`)에 설치하고, config 명령에 label `devday`를 등록합니다.
+2. 표시된 GitHub 안내에 따라 runner를 macOS `launchd` 서비스로 설치·실행합니다. 맥이 켜져 있고 인터넷에 연결되어 있어야 합니다.
+3. `settings.py`에 `ACCESS_CODE`가 설정돼 있는지 확인합니다. 배포 스크립트가 이 값이 없으면 외부 공개를 거부합니다.
+4. 저장소 `main`에 커밋을 push합니다. 첫 성공 배포가 웹 앱과 독립 HTTPS 터널을 시작하고 주소를 `public_url.txt`와 GitHub **Actions** 로그에 기록합니다. 접속 코드는 `settings.py`에서 팀과 안전하게 공유합니다.
+5. 이후 팀원이 `main`에 push/merge하면 자동으로 앱만 재시작합니다. 독립 터널은 계속 실행되므로 보통 주소는 유지됩니다. Mac이 재시작되어 앱과 터널 프로세스가 내려가면 GitHub Actions에서 새 배포를 실행하거나 `./deploy_mac.sh`를 실행해 다시 올립니다.
 
-Render 디스크 요금은 현재 **$0.25/GB/월**이므로 설정한 10GB는 **$2.50/월**이고, 여기에 Web Service 컴퓨팅 요금과 사용량 기준 네트워크 요금이 추가될 수 있습니다. Blueprint를 적용하기 전에 Render 대시보드에서 최종 금액을 확인하세요. 디스크를 사용하는 서비스는 한 번에 한 인스턴스로 운영되며, 배포 중에는 짧은 중단이 생길 수 있습니다. 영상과 분석 결과는 재배포 후에도 영구 디스크에 남습니다.
-
-이 구성은 Render의 **자동 배포 설정**이며, 계정에 실제 서비스를 생성하고 비밀 값을 입력해야 팀 URL이 활성화됩니다. 공개 저장소의 GitHub Actions self-hosted runner에 API 키를 전달하는 구성은 두지 않았습니다.
+보안상 workflow는 `push`만 처리하며 `pull_request`에서 실행하지 않습니다. 저장소가 공개이므로 self-hosted runner는 공개 PR의 코드를 실행하면 안 됩니다. 팀원은 기본 브랜치에 직접 push하지 말고 PR을 사용하세요. 배포 스크립트는 앱 저장소의 미커밋 변경이 있으면 덮어쓰지 않고 실패합니다. 정상 배포에서는 `settings.py`, `input/`, `web_jobs/` 데이터가 유지됩니다. 앱은 localhost에만 바인딩하고 Cloudflare Quick Tunnel을 통해 접속하므로, 맥이 켜져 있고 깨어 있어야 팀이 사용할 수 있습니다.
 
 정상 영상 1개와 이상 여부를 확인할 영상 1개를 넣으면 **API로 ROI 지정 → 로컬 rule-based 측정 → API로 점검 안내 작성**을 수행합니다. 성공하면 진단서를 브라우저에서 자동으로 열고 측정값·이미지·로그는 결과 폴더에 보관합니다.
 
