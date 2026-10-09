@@ -11,6 +11,8 @@
 
 주요 구성과 해커톤 시작 시점의 사전 구현 범위는 [PREHACKATHON.md](PREHACKATHON.md)에 정리했습니다.
 
+같은 영상의 반복 실행, 코드 개선 전후 비교, 실패·판단 보류를 포함한 성능 시각화는 [벤치마크 사용 안내](benchmarks/README.md)를 참고하세요. `python -m devday.benchmark demo --out results/benchmark-demo`로 API 없이 평가 도구를 확인할 수 있습니다.
+
 ## 웹 프로그램으로 쓰기 (권장)
 
 1. `setup.command`를 더블클릭해 설치합니다 (처음 한 번, 새 버전을 받은 뒤에도 한 번).

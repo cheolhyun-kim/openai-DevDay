@@ -2,9 +2,31 @@
 import base64
 import json
 import os
+import runpy
 from pathlib import Path
 from typing import Protocol
 from .contracts import ROIPlan, Diagnosis
+
+LOCAL_SETTINGS = Path(__file__).resolve().parents[1] / 'settings.py'
+
+
+def _openai_api_key():
+    """Read the local ignored settings file without recording credentials in artifacts."""
+    if LOCAL_SETTINGS.is_file():
+        try:
+            settings = runpy.run_path(str(LOCAL_SETTINGS))
+            key = settings.get('OPENAI_API_KEY', '')
+            if not isinstance(key, str):
+                raise TypeError('OPENAI_API_KEY must be a string')
+            if key.strip():
+                return key.strip()
+        except Exception:
+            raise RuntimeError('Cannot load settings.py; check its syntax and OPENAI_API_KEY string') from None
+    key = os.environ.get('OPENAI_API_KEY', '').strip()
+    if not key:
+        raise RuntimeError('Set OPENAI_API_KEY in settings.py or the environment; use replay/demo for offline verification')
+    return key
+
 
 class ModelProvider(Protocol):
     mode: str
@@ -16,9 +38,9 @@ class OpenAIProvider:
     def __init__(self, model=None, client=None):
         self.model=model or os.environ.get('DEVDAY_MODEL','gpt-6-luna')
         if client is None:
-            if not os.environ.get('OPENAI_API_KEY'): raise RuntimeError('Set OPENAI_API_KEY; use replay/demo for offline verification')
+            api_key = _openai_api_key()
             from openai import OpenAI
-            client=OpenAI(timeout=180,max_retries=0)
+            client=OpenAI(api_key=api_key,timeout=180,max_retries=0)
         self.client=client
         self.calls=[]
 

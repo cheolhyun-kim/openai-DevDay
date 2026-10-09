@@ -1,0 +1,23 @@
+{
+  "mode": "measurement",
+  "align_candidate": true,
+  "bands": [
+    [
+      "low",
+      1,
+      10
+    ],
+    [
+      "higher",
+      10,
+      100
+    ]
+  ],
+  "conditions": {
+    "same_speed_confirmed": true,
+    "fixed_camera_confirmed": false,
+    "capture_fps_verified_by_user": false,
+    "timebase_basis": "encoded 240fps / minimum PTS spacing; provisional",
+    "label_semantics": "experimental_condition_only_not_fault"
+  }
+}
