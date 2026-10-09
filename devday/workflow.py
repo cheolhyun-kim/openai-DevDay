@@ -7,7 +7,7 @@ from .contracts import ROIPlan, Diagnosis, to_config
 from .providers import OpenAIProvider
 from .video import prepare_video
 from .measurement import measure, validate_bands, build_evidence
-from .render import heatmaps, inspection_map, reports
+from .render import heatmaps, spectrum_comparison, inspection_map, reports
 from .registration import register, transfer_plan
 from .vendor.fanvib.pipeline import roi_mask
 import cv2
@@ -193,11 +193,14 @@ def run_pipeline(reference_video,candidate_video,*,capture_fps,output_dir,candid
         emit('maps','running');artifacts=[]
         if len(maps)==2:
             artifacts=heatmaps(out/'visuals',{s:metadata[s]['frames'][0]['path'] for s in metadata},maps,evidence,selected_bands)
+            spectrum=spectrum_comparison(out/'visuals',{s:out/'measurements'/s for s in ('reference','candidate')},
+                [r.model_dump() for r in plan.regions if r.role=='target'],alignment,selected_bands)
+            if spectrum is not None:artifacts.append(spectrum)
         diagnosis_images=images.copy()
         for side in metadata:
             p=out/'measurements'/side/'roi.png'
             if p.exists():artifacts.append(p);diagnosis_images.append((side+' proposed ROI overlay',p))
-        diagnosis_images.extend(('Measured heatmap '+p.stem,p) for p in artifacts if p.parent.name=='visuals')
+        diagnosis_images.extend(('Measured heatmap '+p.stem,p) for p in artifacts if p.parent.name=='visuals' and p.name!='spectrum_comparison.png')
         emit('maps','completed');emit('diagnosis_api','running')
         if not evidence['allowed_evidence_ids']:
             diagnosis=Diagnosis(assessment='inconclusive',is_abnormal=None,abnormality_suspected=False,fault_confirmed=False,summary='배경 잡음보다 큰 움직임이 없거나 촬영 대응이 불확실해 판정을 보류합니다.',decision_basis=[],inspection_candidates=[],limitations=evidence['limitations'],recommended_validation=['ROI와 추적 품질을 확인하고 동일 조건에서 다시 촬영하세요.'])
@@ -216,7 +219,7 @@ def run_pipeline(reference_video,candidate_video,*,capture_fps,output_dir,candid
         write_json(out/'diagnosis.json',diagnosis.model_dump())
         decision=final_decision(diagnosis,evidence);write_json(out/'decision.json',decision)
         visual=out/'visuals';visual.mkdir(exist_ok=True);overlay=visual/'inspection_roi.png'
-        inspection_map(metadata['candidate']['frames'][0]['path'],configs['candidate'],diagnosis,overlay);artifacts.append(overlay)
+        inspection_map(metadata['candidate']['frames'][0]['path'],configs['candidate'],diagnosis,overlay,evidence=evidence,maps=maps);artifacts.append(overlay)
         reports(out,diagnosis,evidence,artifacts,model_provider.mode,decision=decision)
         result={'mode':model_provider.mode,'output_dir':str(out),'report_html':str(out/'report.html'),'diagnosis_json':str(out/'diagnosis.json'),'evidence_json':str(out/'evidence.json'),'roi_plan_json':str(out/'roi_plan.json'),'visualizations':[str(p) for p in artifacts],'diagnosis':diagnosis.model_dump(),'decision':decision,'model_calls':getattr(model_provider,'calls',[])}
         write_json(out/'result.json',result);emit('finished','completed');return result

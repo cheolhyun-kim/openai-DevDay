@@ -1,0 +1,23 @@
+name: Deploy on the Mac runner
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-mac
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # This job runs only on the repository owner's private self-hosted Mac runner.
+    # Never add pull_request triggers: the repository is public.
+    if: github.repository == 'cheolhyun-kim/openai-DevDay'
+    runs-on: [self-hosted, macOS, ARM64, devday]
+    timeout-minutes: 15
+    steps:
+      - name: Update the deployed checkout and restart the app
+        run: /Users/kimcheolhyun/DevDay-deploy/deploy_mac.sh

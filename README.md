@@ -25,6 +25,20 @@
 - 분석은 한 번에 하나씩 순서대로 처리하며, 결과는 `web_jobs/<분석 ID>/`에 남습니다. 한 번 분석에 AI 호출은 2번(측정 부위 고르기, 판정)입니다.
 - API 키는 `settings.py`에만 보관하고 공유하거나 커밋하지 마세요. 해당 파일과 입력 영상, 분석 결과는 Git에서 제외됩니다.
 
+## 팀 공동 사용: GitHub push 자동 배포 (맥 호스트)
+
+개발 맥에서 앱을 호스팅하고 **GitHub Actions self-hosted runner**로 배포합니다. [`deploy_mac.yml`](.github/workflows/deploy-mac.yml)은 `main` 브랜치에 push될 때만 실행되어 [`deploy_mac.sh`](deploy_mac.sh)가 최신 코드를 받고 앱을 재시작합니다. 팀원은 각자 브랜치에서 작업하고 Pull Request를 `main`에 병합하면 됩니다.
+
+### 최초 1회 설정
+
+1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 `~/DevDay-runner`에 설치하고, config 명령에 label `devday`를 등록합니다. 배포용 앱 clone은 `~/DevDay-deploy`에 둡니다.
+2. 표시된 GitHub 안내에 따라 runner를 macOS `launchd` 서비스로 설치·실행합니다. 맥이 켜져 있고 사용자가 로그인되어 있으며 인터넷에 연결되어 있어야 합니다.
+3. `settings.py`에 `ACCESS_CODE`가 있으면 그 값을 사용합니다. 없으면 배포 스크립트가 접속 코드를 로컬 파일 `~/DevDay-deploy/.devday_access_code`에 생성합니다. 이 파일은 GitHub에 올라가지 않으며, 팀과 안전하게 공유하세요.
+4. 저장소 `main`에 커밋을 push합니다. 첫 성공 배포가 웹 앱과 독립 HTTPS 터널을 시작하고 주소를 `~/DevDay-deploy/public_url.txt`와 GitHub **Actions** 로그에 기록합니다. 접속 코드는 Actions 로그에 출력하지 않습니다.
+5. 이후 팀원이 `main`에 push/merge하면 앱이 재시작되고, GitHub Actions가 종료된 뒤에도 macOS `launchd`가 앱과 독립 터널을 계속 관리합니다. 같은 로그인 세션에서는 주소가 유지됩니다. Mac 재시작 후 로그인하면 앱과 터널이 자동으로 다시 시작되며 Quick Tunnel 주소는 바뀔 수 있습니다. 최신 주소는 `~/DevDay-deploy/logs/tunnel.error.log`에서 확인하고, `~/DevDay-deploy/deploy_mac.sh`를 실행하면 `public_url.txt`도 갱신됩니다.
+
+보안상 workflow는 `push`만 처리하며 `pull_request`에서 실행하지 않습니다. 저장소가 공개이므로 self-hosted runner는 공개 PR의 코드를 실행하면 안 됩니다. 팀원은 기본 브랜치에 직접 push하지 말고 PR을 사용하세요. 배포 스크립트는 앱 저장소의 미커밋 변경이 있으면 덮어쓰지 않고 실패합니다. 정상 배포에서는 `settings.py`, `input/`, `web_jobs/` 데이터가 유지됩니다. 앱은 localhost에만 바인딩하고 Cloudflare Quick Tunnel을 통해 접속하므로, 맥이 켜져 있고 사용자가 로그인된 상태여야 합니다.
+
 정상 영상 1개와 이상 여부를 확인할 영상 1개를 넣으면 **API로 ROI 지정 → 로컬 rule-based 측정 → API로 점검 안내 작성**을 수행합니다. 성공하면 진단서를 브라우저에서 자동으로 열고 측정값·이미지·로그는 결과 폴더에 보관합니다.
 
 이 저장소는 2026-10-08 실제 실행한 DevDay 프로그램을 공유한 버전입니다. 기존 수동 ROI 측정 전용 버전은 이전 Git 커밋 이력에 남아 있습니다. 코드는 같은 버전이지만, API의 ROI·진단 응답과 촬영 조건에 따라 결과는 달라질 수 있습니다.
@@ -273,6 +287,13 @@ result = run_pipeline(
 대표 프레임은 부품 인식용이고 진동 계산은 전체 프레임으로 수행합니다. 촬영 FPS는 사용자가 명시해야 하며 슬로모션/카카오톡 내보내기가 원본 프레임을 유지하는지는 별도 검증이 필요합니다. 수치 단위는 px이며 mm/RPM이 아닙니다. 전체 구간 생존점 3개 이상은 최소 계산 조건일 뿐 충분한 신뢰도를 보장하지 않습니다. 매끄러운 표면·회전 날개·배경 케이블·카메라 안정화/원근·압축/노출 변화가 오차를 만들 수 있습니다. 기존 affine가 실패하면 해당 영상 측정을 실패로 표시하며 임의 보정값으로 대체하지 않습니다. 비교 근거에서 제외된 ROI는 모델 점검 위치로 허용하지 않습니다.
 
 코드는 기존 fan-video-vibration 분석 핵심을 `devday/vendor/fanvib`에 복사해 추적 배열 저장만 추가했습니다. 출처: https://github.com/Kongheechul/fan-video-vibration (MIT). 원 저장소/원본 영상은 수정하지 않습니다.
+
+## 외부 구성요소·데이터·모델 출처와 사용 범위
+
+- **기존 코드:** [`Kongheechul/fan-video-vibration`](https://github.com/Kongheechul/fan-video-vibration), MIT. `devday/vendor/fanvib/`에 측정 핵심을 복사해 사용하며, 이 프로젝트에서는 추적 결과 저장 기능을 덧붙였습니다. 원 저장소는 변경하지 않았습니다.
+- **Python 라이브러리:** 직접 의존성과 버전 범위는 [`pyproject.toml`](pyproject.toml), 설치 버전 기록은 [`requirements.lock.txt`](requirements.lock.txt)에 있습니다. [NumPy](https://numpy.org/)·[SciPy](https://scipy.org/)는 배열·신호 처리를, [OpenCV](https://opencv.org/)는 영상 디코딩·프레임 추적·정합을, [Matplotlib](https://matplotlib.org/)는 시각화를, [Pydantic](https://docs.pydantic.dev/)은 모델 입출력 검증을 담당합니다. [OpenAI Python SDK](https://github.com/openai/openai-python)와 [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python)는 선택한 모델 API를 호출합니다. [FastAPI](https://fastapi.tiangolo.com/)·[Uvicorn](https://www.uvicorn.org/)·[python-multipart](https://github.com/Kludex/python-multipart)는 웹 화면, 서버, 영상 업로드에 사용합니다. 각 구성요소의 원 라이선스와 고지는 해당 배포본 및 공식 저장소를 따릅니다.
+- **모델/API:** 사용자가 로컬 `settings.py`에서 공급자와 모델을 선택합니다. 기준 설정의 OpenAI 모델은 `gpt-6-luna`이며 Anthropic 경로도 지원합니다. [OpenAI API](https://developers.openai.com/api/docs/) 또는 [Anthropic API](https://docs.anthropic.com/en/docs/intro-to-claude)를 통해 측정 ROI 제안과 결과 설명에만 사용합니다. 영상 추적·수치 계산은 로컬 코드에서 수행합니다. API에는 대표 프레임·ROI 이미지와 측정 JSON을 보내며, 원본 영상 파일은 전송하지 않습니다.
+- **데이터·템플릿:** 저장소에는 공개 외부 영상 데이터셋이나 제3자 UI 템플릿을 포함하지 않습니다. `examples/*phone*replay.json`은 실제 휴대폰 영상 분석에서 저장한 응답을 오프라인 재생하는 예시이며 원본 영상은 포함하지 않습니다. 나머지 합성 replay 예시는 연결 흐름 시연용입니다. 사용자가 웹에 올린 영상과 `web_jobs/` 실행 결과는 배포 Mac에 저장되며 Git에는 포함되지 않습니다.
 
 ## 검사
 

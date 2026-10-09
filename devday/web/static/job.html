@@ -11,6 +11,7 @@
   <a href="/" class="note">← 새 분석</a>
   <div class="eyebrow" id="files" style="margin-top:10px"></div>
   <h1 id="title">분석 중이에요</h1>
+  <div id="demo-banner" class="demo-banner" hidden>데모 결과 · 이전 분석의 저장 데이터를 사용했어요. 새 AI 분석을 실행하지 않은 예시 화면입니다.</div>
   <div id="warnings"></div>
   <section id="progress" class="card">
     <h2>진행 상황</h2>
@@ -72,17 +73,27 @@ function citedCard(r) {
 }
 
 function checksCard(r) {
-  if (!r.candidates.length) return '';
   const img = r.images.find(i => i.path === 'visuals/inspection_roi.png');
+  const hasIncrease = r.table.some(t => t.flag === 'increase' && t.used);
+  if (!r.candidates.length && !hasIncrease) return '';
   const items = r.candidates.map(c => `<div class="check"><div class="n">${c.number}</div><div>
       <h3>${esc(c.part)}</h3><div class="conf">${c.confidence === 'low' ? '추가 확인 후보 · 근거가 약해요' : '우선 확인 후보'}</div>
       <p>${esc(c.reason)}</p><p class="action">${esc(c.action)}</p>
       ${c.alternatives?.length ? `<details><summary class="note">다른 가능성</summary><ul class="plain note">${c.alternatives.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : ''}
     </div></div>`).join('');
   return `<section class="card"><h2>어디를 확인하면 좋을까요?</h2><div class="grid2">
-      ${img ? `<figure><img src="${fileUrl(img.path)}" alt="확인해볼 위치"><figcaption>주황색 번호가 아래 점검 안내의 위치예요.</figcaption></figure>` : ''}
-      <div class="checks">${items}</div></div>
+      ${img ? `<figure><img src="${fileUrl(img.path)}" alt="측정된 흔들림 증가 부위와 점검 후보 위치"><figcaption>빨강은 수치 규칙으로 흔들림 증가가 측정된 부위, 주황은 AI 추가 점검 후보, 하늘색 점은 영상에서 추적한 지점이에요.</figcaption></figure>` : ''}
+      <div class="checks">${items || '<p class="note">수치 규칙 기준으로 흔들림 증가가 측정된 부위를 이미지에 표시했어요. 추가 점검 안내 후보는 없어요.</p>'}</div></div>
       <p class="note">흔들림이 커진 위치가 곧 고장 원인이라는 뜻은 아니에요.</p></section>`;
+}
+
+function spectrumCard(r) {
+  const img = r.images.find(i => i.path === 'visuals/spectrum_comparison.png');
+  if (!img) return '';
+  return `<section class="card"><h2>주파수별 흔들림 비교</h2>
+    <figure class="spectrum"><a href="${fileUrl(img.path)}" target="_blank"><img src="${fileUrl(img.path)}" alt="부위별 정상 영상과 점검 영상의 주파수 스펙트럼 비교" loading="lazy"></a>
+    <figcaption>가로축은 주파수(Hz), 세로축은 영상에서 측정한 움직임 에너지예요. 파란색은 정상 영상, 빨간색은 점검 영상입니다. 음영은 선택된 측정 대역이에요.</figcaption></figure>
+    <p class="note">점검 영상의 선이 높으면 해당 주파수에서 화면 움직임이 더 크게 측정된 것입니다. 이것만으로 고장이나 원인 위치가 확정되지는 않아요.</p></section>`;
 }
 
 function tableCard(r) {
@@ -108,11 +119,12 @@ function infoCard(r) {
     <dt>AI 호출</dt><dd>${esc(r.mode || '')} · ${esc(tokens || '-')}</dd></dl>
     ${r.limitations?.length ? `<details style="margin-top:12px"><summary>AI가 적은 한계</summary><ul class="plain">${r.limitations.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>` : ''}
     ${r.recommended_validation?.length ? `<details><summary>추가 확인 방법</summary><ul class="plain">${r.recommended_validation.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>` : ''}
-    <p class="links" style="margin-top:12px">${r.files.map(f => `<a href="${fileUrl(f)}" target="_blank">${esc(f)}</a>`).join('')}</p></section>`;
+    <p class="links" style="margin-top:12px"><a class="download" href="/api/jobs/${jobId}/archive">분석 기록 전체 다운로드 (영상 제외)</a></p>
+    <p class="links">${r.files.map(f => `<a href="${fileUrl(f)}" target="_blank">${esc(f)}</a>`).join('')}</p></section>`;
 }
 
 function galleryCard(r) {
-  const imgs = r.images.filter(i => i.path !== 'visuals/inspection_roi.png');
+  const imgs = r.images.filter(i => !['visuals/inspection_roi.png','visuals/spectrum_comparison.png'].includes(i.path));
   if (!imgs.length) return '';
   return `<section class="card"><h2>측정 화면</h2><div class="gallery">${imgs.map(i => `<figure class="${i.path.includes('heatmap') ? 'wide' : ''}"><a href="${fileUrl(i.path)}" target="_blank"><img src="${fileUrl(i.path)}" alt="${esc(i.title)}" loading="lazy"></a><figcaption>${esc(i.title)}</figcaption></figure>`).join('')}</div>
     <p class="note">측정 지도는 코드가 측정값으로 그린 그림이에요. 고장 확률이 아니에요.</p></section>`;
@@ -134,9 +146,10 @@ async function poll() {
   if (job.state === 'done') {
     const r = job.results;
     document.getElementById('title').textContent = '분석 결과';
+    document.getElementById('demo-banner').hidden = !job.is_demo;
     document.getElementById('progress').hidden = true;
     const out = document.getElementById('result');
-    out.innerHTML = verdictCard(r) + citedCard(r) + checksCard(r) + tableCard(r) + galleryCard(r) + infoCard(r);
+    out.innerHTML = verdictCard(r) + citedCard(r) + checksCard(r) + spectrumCard(r) + tableCard(r) + galleryCard(r) + infoCard(r);
     out.hidden = false;
     return;
   }

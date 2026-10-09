@@ -4,6 +4,12 @@
 
 이 문서는 해커톤 기간에 새로 만든 작업과 사전에 구현된 기반을 구분하기 위한 기록입니다. 코드와 작업 파일의 상태를 설명하며, 해커톤 주최 측의 규정 해석이나 사전 작업 허용 여부를 대신하지 않습니다.
 
+## 저장소 이력 보존과 시작 시점 확인
+
+- 이 저장소의 `main` 커밋 이력은 그대로 보존하며, 커밋 삭제·재작성·기존 프로젝트를 새 이력으로 위장하는 작업을 하지 않습니다.
+- 현재 이력에서 `74ef47c` (`2026-10-09 10:57`, `Initial commit`)에는 한 줄짜리 README만 있고 프로그램 코드는 없습니다. 기존 프로토타입은 `fe10421` (`2026-10-09 11:02`, `Publish DevDay vibration diagnosis prototype`)에서 추가됐습니다.
+- 따라서 공식 행사 시작 및 저장소 등록 시각이 10:57 이전인지, 10:57~11:02 사이인지에 따라 “이력 없는 빈 저장소 등록” 조건은 별도 확인이 필요합니다. 사전 구현 코드를 숨기지 않고 아래 시작 당시 범위에 기록합니다. 이 시각 요건은 저장소 내용만으로 확정할 수 없으므로 주최 측에 현재 커밋 이력을 그대로 보여 확인해야 합니다.
+
 ## 시작 전에 준비된 것
 
 ### 제품 흐름과 웹 인터페이스
@@ -50,4 +56,11 @@
 
 | 날짜 | 새로 만든/검증한 내용 | 근거 |
 |---|---|---|
+| 2026-10-09 (해커톤 기간) | 기존 웹 앱에 완료된 작업별 ZIP 다운로드를 추가함. `job.json`과 분석 결과를 담고 업로드 원본 영상·추출 프레임은 제외함. | `28be090` (`Add downloadable shared analysis records`), `devday/web/app.py`, `devday/web/static/job.html` |
+| 2026-10-09 (해커톤 기간) | Mac self-hosted runner에서 `main` push 자동 배포, `launchd` 앱·터널 서비스, 로컬 접속 코드 보관, 안전한 앱 재시작을 구성하고 팀 배포 절차를 문서화함. | `44bca3e`, `6b8e70b`, `72754ef`, `57a72ae`; `.github/workflows/deploy-mac.yml`, `deploy_mac.sh`, `launchd/`, `README.md` |
+| 2026-10-09 (해커톤 기간) | 결과 화면에 정상·점검 영상의 ROI별 주파수 스펙트럼 비교를 추가하고, 측정 규칙상 증가한 부위와 AI 추가 점검 후보를 구분해 영상에 표시함. 이는 화면 움직임을 시각화하며 물리 단위 진동이나 고장 위치를 확정하지 않음. | `ac149e5` (`Add vibration spectrum and location visuals`), `devday/render.py`, `devday/workflow.py`, `devday/web/` |
+| 2026-10-09 (해커톤 기간) | 메인 화면에 데모 진입 버튼을 추가함. 기존 완료 기록 하나를 원본 영상 없이 별도 복제하고 저장된 측정값으로 최신 시각화를 생성해 보여주며, 새 분석이나 AI 호출은 하지 않음. 데모를 최근 분석 목록에서 제외하고 데모 표시를 붙임. | `1a73655` (`Add read-only demo result page`), `devday/web/app.py`, `devday/web/static/` |
+| 2026-10-09 (해커톤 기간) | CoffeeTech를 참고한 단일 영어 랜딩 화면과 팀 제공 팬 이미지를 적용함. 장비별 정상 기준 영상을 등록하고, 진단 시 저장된 장비를 골라 점검 영상만 올리는 흐름 및 분석 기록 화면을 구현함. 첫 화면의 작은 화면 구성도 다듬음. | `0c9fa6a` (`Add asset based anomaly diagnosis flow`), `07fe45f` (`Refine landing viewport composition`), `devday/web/app.py`, `devday/web/static/` |
+| 2026-10-09 (해커톤 기간) | 랜딩 화면을 Orix Creative의 Operations Intelligence UI 레이아웃에 맞춰 재구성함. 하늘 배경, 중앙 헤드라인·Detect Anomaly 버튼, 상단 메뉴와 반복 CTA, 실제 기능 링크가 있는 3단계 안내 카드를 배치함. 기존 RotorSense 이름과 파란색 시각 체계를 장비·진단·기록 화면에도 적용함. | `53efaa3` (`Redesign landing around operations reference`), `e4f8aa5` (RotorSense identity follow-up), `devday/web/static/`, `devday/web/static/assets/README.md`; [Dribbble reference](https://dribbble.com/shots/27614384-SaaS-Landing-Page-Operations-Intelligence-Web-UI) |
+| 2026-10-09 (해커톤 기간) | 진한 파란 패널을 밝고 투명한 스타일로 바꾸고, 브랜드명을 Wi-ing Wi-ing으로 변경함. 랜딩과 기능 화면의 심볼 로고를 제거함. | `52030f0` (`Remove navy hero and rename Wi-ing Wi-ing`), `devday/web/static/` |
 |  |  |  |

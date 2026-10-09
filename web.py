@@ -40,7 +40,9 @@ def load_settings(root=ROOT):
     model = values.get('CLAUDE_MODEL') if kind == 'claude' else values.get('MODEL')
     from devday.providers import AnthropicProvider
     model = model or (os.environ.get('DEVDAY_CLAUDE_MODEL', AnthropicProvider.DEFAULT_MODEL) if kind == 'claude' else os.environ.get('DEVDAY_MODEL', 'gpt-6-luna'))
-    code = str(values.get('ACCESS_CODE') or os.environ.get('DEVDAY_ACCESS_CODE') or '').strip()
+    local_code_file = root / '.devday_access_code'
+    local_code = local_code_file.read_text(encoding='utf-8').strip() if local_code_file.is_file() else ''
+    code = str(values.get('ACCESS_CODE') or os.environ.get('DEVDAY_ACCESS_CODE') or local_code).strip()
     return kind, model, key_name, bool(key), code
 
 
@@ -93,7 +95,7 @@ def lan_ip():
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='흔들림 비교 진단 웹 프로그램')
-    parser.add_argument('--port', type=int, default=8000)
+    parser.add_argument('--port', type=int, default=int(os.environ.get('PORT', '8000')))
     parser.add_argument('--lan', action='store_true', help='같은 네트워크의 다른 기기(휴대폰)에서 접속 허용')
     parser.add_argument('--public', action='store_true', help='외부 어디서나 접속 가능한 https 주소 만들기 (접속 코드 필수)')
     parser.add_argument('--no-browser', action='store_true')
@@ -106,8 +108,9 @@ def main(argv=None):
     import uvicorn
     info = {'provider': kind, 'provider_label': LABELS[kind], 'model': model, 'key_missing': not has_key,
             'max_request_mb': 95 if args.public else None}  # Cloudflare free tunnels cap one upload at 100MB
-    app = create_app(ROOT, lambda: make_provider(kind, model), info, access_code=code or None)
-    host = '0.0.0.0' if args.lan else '127.0.0.1'
+    data_root = Path(os.environ.get('DEVDAY_DATA_DIR', ROOT)).expanduser()
+    app = create_app(data_root, lambda: make_provider(kind, model), info, access_code=code or None)
+    host = '0.0.0.0' if args.lan or os.environ.get('PORT') else '127.0.0.1'
     url = f'http://127.0.0.1:{args.port}'
     print(f'AI: {LABELS[kind]} · 모델 {model}')
     if not has_key:
