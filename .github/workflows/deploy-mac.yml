@@ -20,5 +20,4 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Update the deployed checkout and restart the app
-        run: |
-          exec "$HOME/Library/Application Support/DevDay-deploy/deploy_mac.sh"
+        run: "$HOME/DevDay-deploy/deploy_mac.sh"
