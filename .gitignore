@@ -7,5 +7,7 @@ settings.py
 results/
 input/*
 !input/README.txt
+benchmarks/input/*
+!benchmarks/input/README.txt
 web_jobs/
 public_url.txt

@@ -1,0 +1,229 @@
+{
+  "object_name": "?? ??? ??",
+  "same_setup_assessment": "consistent",
+  "regions": [
+    {
+      "id": "guard_top",
+      "part_name": "??? ??",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.4,
+          0.142,
+          0.21,
+          0.045
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.4,
+          0.142,
+          0.21,
+          0.045
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "guard_left",
+      "part_name": "??? ??",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.185,
+          0.28,
+          0.09,
+          0.115
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.185,
+          0.28,
+          0.09,
+          0.115
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "guard_right",
+      "part_name": "??? ???",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.765,
+          0.275,
+          0.09,
+          0.13
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.765,
+          0.275,
+          0.09,
+          0.13
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "guard_lower",
+      "part_name": "??? ?? ???",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.435,
+          0.493,
+          0.17,
+          0.043
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.435,
+          0.493,
+          0.17,
+          0.043
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "neck_collar",
+      "part_name": "? ???",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.455,
+          0.579,
+          0.095,
+          0.05
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.455,
+          0.579,
+          0.095,
+          0.05
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "base_knob",
+      "part_name": "??? ???",
+      "role": "target",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.485,
+          0.807,
+          0.085,
+          0.072
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.485,
+          0.807,
+          0.085,
+          0.072
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "floor_left",
+      "part_name": "?? ?? ??",
+      "role": "background",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.035,
+          0.68,
+          0.15,
+          0.21
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.035,
+          0.68,
+          0.15,
+          0.21
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    },
+    {
+      "id": "floor_right",
+      "part_name": "??? ?? ??",
+      "role": "background",
+      "reference": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.815,
+          0.755,
+          0.155,
+          0.21
+        ],
+        "points_xy": null
+      },
+      "candidate": {
+        "shape": "rectangle",
+        "bounds_xywh": [
+          0.815,
+          0.755,
+          0.155,
+          0.21
+        ],
+        "points_xy": null
+      },
+      "semantic_confidence": "high",
+      "caution": "Manually selected from representative frames; not an AI ROI proposal. Moving blades/flicker and full-duration tracking may invalidate a region."
+    }
+  ],
+  "relative_pairs": [],
+  "limitations": [
+    "Manual ROI baseline; scene correspondence reviewed on first representative frames only.",
+    "Capture FPS 240 is provisional from encoder metadata; no calibrated frequency or fault claim.",
+    "All slices conservatively grouped together; independent recordings/session count unknown.",
+    "Base-left rectangle excluded before measurement because it overlaps textured static floor."
+  ]
+}
