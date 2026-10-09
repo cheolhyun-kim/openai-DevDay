@@ -8,6 +8,7 @@ LOG_DIR="$APP_DIR/logs"
 PID_FILE="$APP_DIR/.devday_web.pid"
 TUNNEL_PID_FILE="$APP_DIR/.devday_tunnel.pid"
 TUNNEL_URL_FILE="$APP_DIR/public_url.txt"
+ACCESS_CODE_FILE="$APP_DIR/.devday_access_code"
 CLOUDFLARED="/opt/homebrew/bin/cloudflared"
 
 mkdir -p "$LOG_DIR"
@@ -27,9 +28,15 @@ if [[ ! -x "$APP_DIR/.venv/bin/python" ]]; then
 fi
 "$APP_DIR/.venv/bin/python" -m pip install -e .
 
-# Public access must require the code already configured in the ignored settings.py.
+# Create a local-only access code if settings.py and the environment do not provide one.
 if ! "$APP_DIR/.venv/bin/python" -c 'from web import load_settings; raise SystemExit(0 if load_settings()[4] else 1)'; then
-  echo 'settings.py must define a non-empty ACCESS_CODE before public deployment.'
+  if [[ ! -s "$ACCESS_CODE_FILE" ]]; then
+    openssl rand -hex 16 > "$ACCESS_CODE_FILE"
+    chmod 600 "$ACCESS_CODE_FILE"
+  fi
+fi
+if ! "$APP_DIR/.venv/bin/python" -c 'from web import load_settings; raise SystemExit(0 if load_settings()[4] else 1)'; then
+  echo 'Could not create or load the local public access code.'
   exit 1
 fi
 

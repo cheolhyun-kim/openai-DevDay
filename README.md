@@ -29,11 +29,11 @@
 
 ### 최초 1회 설정
 
-1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 `~/Library/Application Support/DevDay-runner`에 설치하고, config 명령에 label `devday`를 등록합니다. 배포용 앱은 `~/Library/Application Support/DevDay-deploy`에 따로 둡니다.
+1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 `~/Library/Application Support/DevDay-runner`에 설치하고, config 명령에 label `devday`를 등록합니다. 배포용 앱 clone은 `~/DevDay-deploy`에 둡니다.
 2. 표시된 GitHub 안내에 따라 runner를 macOS `launchd` 서비스로 설치·실행합니다. 맥이 켜져 있고 인터넷에 연결되어 있어야 합니다.
-3. `settings.py`에 `ACCESS_CODE`가 설정돼 있는지 확인합니다. 배포 스크립트가 이 값이 없으면 외부 공개를 거부합니다.
-4. 저장소 `main`에 커밋을 push합니다. 첫 성공 배포가 웹 앱과 독립 HTTPS 터널을 시작하고 주소를 `public_url.txt`와 GitHub **Actions** 로그에 기록합니다. 접속 코드는 `settings.py`에서 팀과 안전하게 공유합니다.
-5. 이후 팀원이 `main`에 push/merge하면 자동으로 앱만 재시작합니다. 독립 터널은 계속 실행되므로 보통 주소는 유지됩니다. 배포 코드와 결과는 macOS 보호 폴더인 Desktop 대신 `~/Library/Application Support/DevDay-deploy`에 저장합니다. Mac 재시작 후 앱/터널이 내려가면 Actions에서 배포를 다시 실행하거나 해당 폴더에서 `./deploy_mac.sh`를 실행합니다.
+3. `settings.py`에 `ACCESS_CODE`가 있으면 그 값을 사용합니다. 없으면 배포 스크립트가 접속 코드를 로컬 파일 `~/DevDay-deploy/.devday_access_code`에 생성합니다. 이 파일은 GitHub에 올라가지 않으며, 팀과 안전하게 공유하세요.
+4. 저장소 `main`에 커밋을 push합니다. 첫 성공 배포가 웹 앱과 독립 HTTPS 터널을 시작하고 주소를 `~/DevDay-deploy/public_url.txt`와 GitHub **Actions** 로그에 기록합니다. 접속 코드는 Actions 로그에 출력하지 않습니다.
+5. 이후 팀원이 `main`에 push/merge하면 자동으로 앱만 재시작합니다. 독립 터널은 계속 실행되므로 보통 주소는 유지됩니다. 배포 코드와 결과는 macOS 보호 폴더인 Desktop 대신 `~/DevDay-deploy`에 저장합니다. Mac 재시작 후 앱/터널이 내려가면 Actions에서 배포를 다시 실행하거나 `~/DevDay-deploy/deploy_mac.sh`를 실행합니다.
 
 보안상 workflow는 `push`만 처리하며 `pull_request`에서 실행하지 않습니다. 저장소가 공개이므로 self-hosted runner는 공개 PR의 코드를 실행하면 안 됩니다. 팀원은 기본 브랜치에 직접 push하지 말고 PR을 사용하세요. 배포 스크립트는 앱 저장소의 미커밋 변경이 있으면 덮어쓰지 않고 실패합니다. 정상 배포에서는 `settings.py`, `input/`, `web_jobs/` 데이터가 유지됩니다. 앱은 localhost에만 바인딩하고 Cloudflare Quick Tunnel을 통해 접속하므로, 맥이 켜져 있고 깨어 있어야 팀이 사용할 수 있습니다.
 

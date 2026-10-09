@@ -40,7 +40,9 @@ def load_settings(root=ROOT):
     model = values.get('CLAUDE_MODEL') if kind == 'claude' else values.get('MODEL')
     from devday.providers import AnthropicProvider
     model = model or (os.environ.get('DEVDAY_CLAUDE_MODEL', AnthropicProvider.DEFAULT_MODEL) if kind == 'claude' else os.environ.get('DEVDAY_MODEL', 'gpt-6-luna'))
-    code = str(values.get('ACCESS_CODE') or os.environ.get('DEVDAY_ACCESS_CODE') or '').strip()
+    local_code_file = root / '.devday_access_code'
+    local_code = local_code_file.read_text(encoding='utf-8').strip() if local_code_file.is_file() else ''
+    code = str(values.get('ACCESS_CODE') or os.environ.get('DEVDAY_ACCESS_CODE') or local_code).strip()
     return kind, model, key_name, bool(key), code
 
 
