@@ -80,11 +80,13 @@ def candidate_peaks(signal,fs):
 
 def measure(video, config, directory, bands):
     result=analyze_video(video,config,directory)
-    d=np.load(Path(directory)/'tracks.npz',allow_pickle=False)
-    tr=d['tr'][:,d['keep']];labels=d['labels'][d['keep']];raw=tr-tr[0]
+    with np.load(Path(directory)/'tracks.npz',allow_pickle=False) as d:
+        tr=d['tr'][:,d['keep']];labels=d['labels'][d['keep']]
+    raw=tr-tr[0]
     bg_names=[r['id'] for r in config['rois'] if r['role']=='background'];bg=np.isin(labels,bg_names)
     translation=raw-np.median(raw[:,bg],axis=1)[:,None,:]
-    signals=np.load(Path(directory)/'signals.npz',allow_pickle=False)
+    with np.load(Path(directory)/'signals.npz',allow_pickle=False) as archive:
+        signals={key:archive[key] for key in archive.files}
     fs=config['capture_fps'];regions={};point_values={};rel={}
     for name,lo,hi in bands:
         values=band_rms(translation,fs,lo,hi,config['nperseg'])
@@ -113,7 +115,7 @@ def measure(video, config, directory, bands):
         regions[n]=rec
     for a,b in config['relative_pairs']:
         name=a+'_minus_'+b;key=name+'__raw'
-        if key not in signals.files: continue
+        if key not in signals: continue
         rel[name]={'a':a,'b':b,'bands':{}}
         for bn,lo,hi in bands:
             v=band_rms(signals[key],fs,lo,hi,config['nperseg'])

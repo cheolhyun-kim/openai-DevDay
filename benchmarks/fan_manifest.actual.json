@@ -1,0 +1,733 @@
+{
+  "schema_version": "devday.dataset/1",
+  "name": "uploaded-weak-four-conditions",
+  "minimum_gap_frames": 0,
+  "recordings": [
+    {
+      "id": "s000",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_01.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_01.MOV"
+    },
+    {
+      "id": "s001",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_02.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_02.MOV"
+    },
+    {
+      "id": "s002",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_03.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_03.MOV"
+    },
+    {
+      "id": "s003",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_04.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_04.MOV"
+    },
+    {
+      "id": "s004",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_05.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_05.MOV"
+    },
+    {
+      "id": "s005",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_06.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_06.MOV"
+    },
+    {
+      "id": "s006",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\02_미풍_정상\\02_미풍_정상_07.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "02_미풍_정상_07.MOV"
+    },
+    {
+      "id": "s007",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_01.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_01.MOV"
+    },
+    {
+      "id": "s008",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_02.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_02.MOV"
+    },
+    {
+      "id": "s009",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_03.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_03.MOV"
+    },
+    {
+      "id": "s010",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_04.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_04.MOV"
+    },
+    {
+      "id": "s011",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_05.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_05.MOV"
+    },
+    {
+      "id": "s012",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_06.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_06.MOV"
+    },
+    {
+      "id": "s013",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\05_미풍_떨림_V1\\05_미풍_떨림_V1_07.MOV",
+      "speed": "weak",
+      "condition": "tremor_v1",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "05_미풍_떨림_V1_07.MOV"
+    },
+    {
+      "id": "s014",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_01.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_01.MOV"
+    },
+    {
+      "id": "s015",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_02.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_02.MOV"
+    },
+    {
+      "id": "s016",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_03.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_03.MOV"
+    },
+    {
+      "id": "s017",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_04.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_04.MOV"
+    },
+    {
+      "id": "s018",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_05.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_05.MOV"
+    },
+    {
+      "id": "s019",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_06.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_06.MOV"
+    },
+    {
+      "id": "s020",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\08_미풍_떨림_V2\\08_미풍_떨림_V2_07.MOV",
+      "speed": "weak",
+      "condition": "tremor_v2",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "08_미풍_떨림_V2_07.MOV"
+    },
+    {
+      "id": "s021",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_01.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_01.MOV"
+    },
+    {
+      "id": "s022",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_02.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_02.MOV"
+    },
+    {
+      "id": "s023",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_03.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_03.MOV"
+    },
+    {
+      "id": "s024",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_04.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_04.MOV"
+    },
+    {
+      "id": "s025",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_05.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_05.MOV"
+    },
+    {
+      "id": "s026",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_06.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_06.MOV"
+    },
+    {
+      "id": "s027",
+      "path": "C:\\Prometheus\\openai-DevDay\\benchmarks\\input\\11_미풍_동전100원\\11_미풍_동전100원_07.MOV",
+      "speed": "weak",
+      "condition": "coin_100won",
+      "group_id": "unverified-shared-session-01",
+      "capture_fps": 240,
+      "frame_preservation_verified": false,
+      "capture_fps_verified_by_user": false,
+      "timebase_basis": "Provisional 240Hz from encoded fps=240/1 and observed minimum PTS spacing 1/240s; physical capture and export preservation unconfirmed",
+      "source_filename": "11_미풍_동전100원_07.MOV"
+    }
+  ],
+  "clips": [
+    {
+      "id": "c000",
+      "recording_id": "s000",
+      "start_frame": 0,
+      "end_frame": 715
+    },
+    {
+      "id": "c001",
+      "recording_id": "s001",
+      "start_frame": 0,
+      "end_frame": 709
+    },
+    {
+      "id": "c002",
+      "recording_id": "s002",
+      "start_frame": 0,
+      "end_frame": 708
+    },
+    {
+      "id": "c003",
+      "recording_id": "s003",
+      "start_frame": 0,
+      "end_frame": 710
+    },
+    {
+      "id": "c004",
+      "recording_id": "s004",
+      "start_frame": 0,
+      "end_frame": 711
+    },
+    {
+      "id": "c005",
+      "recording_id": "s005",
+      "start_frame": 0,
+      "end_frame": 709
+    },
+    {
+      "id": "c006",
+      "recording_id": "s006",
+      "start_frame": 0,
+      "end_frame": 707
+    },
+    {
+      "id": "c007",
+      "recording_id": "s007",
+      "start_frame": 0,
+      "end_frame": 706
+    },
+    {
+      "id": "c008",
+      "recording_id": "s008",
+      "start_frame": 0,
+      "end_frame": 710
+    },
+    {
+      "id": "c009",
+      "recording_id": "s009",
+      "start_frame": 0,
+      "end_frame": 711
+    },
+    {
+      "id": "c010",
+      "recording_id": "s010",
+      "start_frame": 0,
+      "end_frame": 710
+    },
+    {
+      "id": "c011",
+      "recording_id": "s011",
+      "start_frame": 0,
+      "end_frame": 712
+    },
+    {
+      "id": "c012",
+      "recording_id": "s012",
+      "start_frame": 0,
+      "end_frame": 715
+    },
+    {
+      "id": "c013",
+      "recording_id": "s013",
+      "start_frame": 0,
+      "end_frame": 711
+    },
+    {
+      "id": "c014",
+      "recording_id": "s014",
+      "start_frame": 0,
+      "end_frame": 716
+    },
+    {
+      "id": "c015",
+      "recording_id": "s015",
+      "start_frame": 0,
+      "end_frame": 715
+    },
+    {
+      "id": "c016",
+      "recording_id": "s016",
+      "start_frame": 0,
+      "end_frame": 711
+    },
+    {
+      "id": "c017",
+      "recording_id": "s017",
+      "start_frame": 0,
+      "end_frame": 715
+    },
+    {
+      "id": "c018",
+      "recording_id": "s018",
+      "start_frame": 0,
+      "end_frame": 715
+    },
+    {
+      "id": "c019",
+      "recording_id": "s019",
+      "start_frame": 0,
+      "end_frame": 718
+    },
+    {
+      "id": "c020",
+      "recording_id": "s020",
+      "start_frame": 0,
+      "end_frame": 712
+    },
+    {
+      "id": "c021",
+      "recording_id": "s021",
+      "start_frame": 0,
+      "end_frame": 712
+    },
+    {
+      "id": "c022",
+      "recording_id": "s022",
+      "start_frame": 0,
+      "end_frame": 705
+    },
+    {
+      "id": "c023",
+      "recording_id": "s023",
+      "start_frame": 0,
+      "end_frame": 711
+    },
+    {
+      "id": "c024",
+      "recording_id": "s024",
+      "start_frame": 0,
+      "end_frame": 712
+    },
+    {
+      "id": "c025",
+      "recording_id": "s025",
+      "start_frame": 0,
+      "end_frame": 710
+    },
+    {
+      "id": "c026",
+      "recording_id": "s026",
+      "start_frame": 0,
+      "end_frame": 710
+    },
+    {
+      "id": "c027",
+      "recording_id": "s027",
+      "start_frame": 0,
+      "end_frame": 709
+    }
+  ],
+  "cases": [
+    {
+      "id": "case01",
+      "reference_clip": "c000",
+      "candidate_clip": "c001",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case02",
+      "reference_clip": "c000",
+      "candidate_clip": "c002",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case03",
+      "reference_clip": "c000",
+      "candidate_clip": "c003",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case04",
+      "reference_clip": "c000",
+      "candidate_clip": "c004",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case05",
+      "reference_clip": "c000",
+      "candidate_clip": "c005",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case06",
+      "reference_clip": "c000",
+      "candidate_clip": "c006",
+      "split": "dev",
+      "expected": "unchanged",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case07",
+      "reference_clip": "c000",
+      "candidate_clip": "c007",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case08",
+      "reference_clip": "c000",
+      "candidate_clip": "c008",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case09",
+      "reference_clip": "c000",
+      "candidate_clip": "c009",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case10",
+      "reference_clip": "c000",
+      "candidate_clip": "c010",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case11",
+      "reference_clip": "c000",
+      "candidate_clip": "c011",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case12",
+      "reference_clip": "c000",
+      "candidate_clip": "c012",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case13",
+      "reference_clip": "c000",
+      "candidate_clip": "c013",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case14",
+      "reference_clip": "c000",
+      "candidate_clip": "c014",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case15",
+      "reference_clip": "c000",
+      "candidate_clip": "c015",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case16",
+      "reference_clip": "c000",
+      "candidate_clip": "c016",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case17",
+      "reference_clip": "c000",
+      "candidate_clip": "c017",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case18",
+      "reference_clip": "c000",
+      "candidate_clip": "c018",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case19",
+      "reference_clip": "c000",
+      "candidate_clip": "c019",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case20",
+      "reference_clip": "c000",
+      "candidate_clip": "c020",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case21",
+      "reference_clip": "c000",
+      "candidate_clip": "c021",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case22",
+      "reference_clip": "c000",
+      "candidate_clip": "c022",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case23",
+      "reference_clip": "c000",
+      "candidate_clip": "c023",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case24",
+      "reference_clip": "c000",
+      "candidate_clip": "c024",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case25",
+      "reference_clip": "c000",
+      "candidate_clip": "c025",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case26",
+      "reference_clip": "c000",
+      "candidate_clip": "c026",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    },
+    {
+      "id": "case27",
+      "reference_clip": "c000",
+      "candidate_clip": "c027",
+      "split": "dev",
+      "expected": "changed",
+      "roi_plan_path": "roi.manual-weak.json"
+    }
+  ],
+  "label_semantics": "Experimental condition discrimination only. changed denotes a non-normal named manipulation, not independently proven vibration increase, fault or danger.",
+  "independence_note": "Seven clips per condition conservatively treated as slices of one shared session until user confirmation."
+}

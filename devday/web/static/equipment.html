@@ -1,30 +1,168 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Register Equipment · Wi-ing Wi-ing</title><link rel="stylesheet" href="/static/style.css"></head>
-<body class="app-body"><main class="app-shell">
-  <header class="app-top"><a class="brand app-brand" href="/"><span class="brand-name">Wi-ing Wi-ing<small>MOTION INTELLIGENCE</small></span></a><nav><a href="/">Home</a><a href="/history">Analysis History</a><a class="app-nav-cta" href="/diagnose">Detect Anomaly ↗</a></nav></header>
-  <div class="app-heading"><div class="hero-kicker"><span class="status-dot"></span> ASSET LIBRARY</div><h1>Register Equipment</h1><p>Save one healthy reference video for each asset. Future inspections will use this reference automatically.</p></div>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Register Equipment · Wi-ing Wi-ing</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="app-body">
+<main class="app-shell">
+  <header class="app-top">
+    <a class="brand app-brand" href="/">
+      <span class="brand-name">Wi-ing Wi-ing<small>MOTION INTELLIGENCE</small></span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/history">Analysis History</a>
+      <a class="app-nav-cta" href="/diagnose">Detect Anomaly ↗</a>
+    </nav>
+  </header>
+
+  <div class="app-heading">
+    <div class="hero-kicker"><span class="status-dot"></span> ASSET LIBRARY</div>
+    <h1>Register Equipment</h1>
+    <p>Save one healthy reference video for each asset. Future inspections will use this reference automatically.</p>
+  </div>
+
   <section class="app-card">
     <form id="equipment-form" class="form-grid">
-      <label>Equipment name<input name="name" required maxlength="80" placeholder="e.g. Cooling Fan A-01"></label>
-      <label>Model or type <span class="optional">Optional</span><input name="model" maxlength="120" placeholder="e.g. Axial fan · Model X"></label>
-      <label class="wide">Healthy reference video<input name="normal" type="file" accept="video/*,.mov,.mp4,.m4v,.avi" required><small>Use a stable, healthy operating condition. Slow-motion originals give the clearest frequency results.</small></label>
-      <label>Capture frame rate (FPS)<input name="capture_fps" type="number" min="1" max="10000" step="any" value="240" required><small>Enter the camera capture rate, not the slowed playback rate.</small></label>
-      <div class="wide"><button class="hero-cta form-cta" id="save-equipment" type="submit">Save Equipment <span aria-hidden="true">↗</span></button><div class="form-message" id="form-message" role="status"></div></div>
+      <label>Equipment name
+        <input name="name" required maxlength="80" placeholder="e.g. Cooling Fan A-01">
+      </label>
+      <label>Model or type <span class="optional">Optional</span>
+        <input name="model" maxlength="120" placeholder="e.g. Axial fan · Model X">
+      </label>
+      <label class="wide">Healthy reference video
+        <input name="normal" id="reference-video" type="file" accept="video/*,.mov,.mp4,.m4v,.avi" required>
+        <small id="reference-help">Use a stable, healthy operating condition. Slow-motion originals give the clearest frequency results.</small>
+        <small id="current-reference" class="current-reference" hidden></small>
+      </label>
+      <label>Capture frame rate (FPS)
+        <input name="capture_fps" type="number" min="1" max="10000" step="any" value="240" required>
+        <small>Enter the camera capture rate, not the slowed playback rate.</small>
+      </label>
+      <div class="wide">
+        <div class="form-actions">
+          <button class="hero-cta form-cta" id="save-equipment" type="submit">Save Equipment <span aria-hidden="true">↗</span></button>
+          <button class="form-cancel" id="cancel-edit" type="button" hidden>Cancel edit</button>
+        </div>
+        <div class="form-message" id="form-message" role="status"></div>
+      </div>
     </form>
   </section>
-  <section class="app-card"><div class="section-heading"><div><div class="hero-kicker">REGISTERED ASSETS</div><h2>Your Equipment</h2></div><a class="text-link" href="/diagnose">Go to anomaly detection ↗</a></div><div id="equipment-list" class="asset-list"><p class="muted">Loading equipment…</p></div></section>
+
+  <section class="app-card">
+    <div class="section-heading">
+      <div><div class="hero-kicker">REGISTERED ASSETS</div><h2>Your Equipment</h2></div>
+      <a class="text-link" href="/diagnose">Go to anomaly detection ↗</a>
+    </div>
+    <div id="equipment-list" class="asset-list"><p class="muted">Loading equipment…</p></div>
+  </section>
 </main>
-<script src="/static/common.js"></script><script>
-const form=document.getElementById('equipment-form'),button=document.getElementById('save-equipment'),message=document.getElementById('form-message'),list=document.getElementById('equipment-list');
-async function refreshEquipment(){
-  try{const res=await fetch('/api/equipment'),items=await res.json();
-    list.innerHTML=items.length?items.map(x=>`<article class="asset-row"><div class="asset-icon">${esc((x.name||'E').slice(0,1).toUpperCase())}</div><div class="asset-copy"><strong>${esc(x.name)}</strong><span>${esc(x.model||'Industrial equipment')} · ${esc(x.capture_fps)} FPS</span><small>Reference: ${esc(x.normal?.filename||'Healthy video')}</small></div><a class="text-link" href="/diagnose?equipment=${encodeURIComponent(x.id)}">Inspect ↗</a></article>`).join(''):'<p class="muted">No equipment registered yet. Add a healthy reference to get started.</p>';
-  }catch(_){list.innerHTML='<p class="muted">Equipment list is unavailable right now.</p>';}
+
+<script src="/static/common.js"></script>
+<script>
+const form = document.getElementById('equipment-form');
+const button = document.getElementById('save-equipment');
+const cancelButton = document.getElementById('cancel-edit');
+const message = document.getElementById('form-message');
+const list = document.getElementById('equipment-list');
+const videoInput = document.getElementById('reference-video');
+const referenceHelp = document.getElementById('reference-help');
+const currentReference = document.getElementById('current-reference');
+let equipmentItems = [];
+let editingId = null;
+
+function clearForm(keepMessage = false) {
+  editingId = null;
+  form.reset();
+  form.elements.namedItem('capture_fps').value = '240';
+  videoInput.required = true;
+  referenceHelp.textContent = 'Use a stable, healthy operating condition. Slow-motion originals give the clearest frequency results.';
+  currentReference.textContent = '';
+  currentReference.hidden = true;
+  button.innerHTML = 'Save Equipment <span aria-hidden="true">↗</span>';
+  cancelButton.hidden = true;
+  if (!keepMessage) {
+    message.textContent = '';
+    message.className = 'form-message';
+  }
 }
-form.addEventListener('submit',async e=>{e.preventDefault();message.textContent='Saving reference video…';message.className='form-message';button.disabled=true;
-  try{const body=new FormData(form),res=await fetch('/api/equipment',{method:'POST',body}),data=await res.json();if(!res.ok)throw new Error(data.detail||'Could not register equipment.');message.textContent=`${data.name} is ready for anomaly detection.`;message.className='form-message success';form.reset();form.capture_fps.value='240';await refreshEquipment();}
-  catch(err){message.textContent='Could not save this video. Check the file and capture FPS, then try again.';message.className='form-message error-text';}
-  finally{button.disabled=false;}
+
+function editEquipment(item) {
+  editingId = item.id;
+  form.elements.namedItem('name').value = item.name || '';
+  form.elements.namedItem('model').value = item.model || '';
+  form.elements.namedItem('capture_fps').value = item.capture_fps || 240;
+  videoInput.value = '';
+  videoInput.required = false;
+  referenceHelp.textContent = 'Choose a new video only if you want to replace the saved healthy reference.';
+  currentReference.textContent = `Current reference: ${item.normal?.filename || 'Saved video'}`;
+  currentReference.hidden = false;
+  button.innerHTML = 'Update Equipment <span aria-hidden="true">↗</span>';
+  cancelButton.hidden = false;
+  message.textContent = `Editing ${item.name}. Leave the video empty to keep the current reference.`;
+  message.className = 'form-message';
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function refreshEquipment() {
+  try {
+    const response = await fetch('/api/equipment');
+    equipmentItems = await response.json();
+    if (!response.ok) throw new Error('Equipment list is unavailable right now.');
+    list.innerHTML = equipmentItems.length ? equipmentItems.map(item => `
+      <article class="asset-row">
+        <div class="asset-icon">${esc((item.name || 'E').slice(0, 1).toUpperCase())}</div>
+        <div class="asset-copy">
+          <strong>${esc(item.name)}</strong>
+          <span>${esc(item.model || 'Industrial equipment')} · ${esc(item.capture_fps)} FPS</span>
+          <small>Reference: ${esc(item.normal?.filename || 'Healthy video')}</small>
+        </div>
+        <button class="text-link edit-equipment" type="button" data-edit-id="${esc(item.id)}">Edit <span aria-hidden="true">↗</span></button>
+      </article>`).join('') : '<p class="muted">No equipment registered yet. Add a healthy reference to get started.</p>';
+  } catch (_) {
+    equipmentItems = [];
+    list.innerHTML = '<p class="muted">Equipment list is unavailable right now.</p>';
+  }
+}
+
+list.addEventListener('click', event => {
+  const editButton = event.target.closest('[data-edit-id]');
+  if (!editButton) return;
+  const item = equipmentItems.find(equipment => equipment.id === editButton.dataset.editId);
+  if (item) editEquipment(item);
 });
+
+cancelButton.addEventListener('click', () => clearForm());
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  const wasEditing = Boolean(editingId);
+  const target = wasEditing ? `/api/equipment/${encodeURIComponent(editingId)}` : '/api/equipment';
+  message.textContent = wasEditing ? 'Updating equipment…' : 'Saving reference video…';
+  message.className = 'form-message';
+  button.disabled = true;
+  cancelButton.disabled = true;
+  try {
+    const response = await fetch(target, { method: wasEditing ? 'PUT' : 'POST', body: new FormData(form) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || 'Could not save equipment.');
+    message.textContent = wasEditing ? `${data.name} was updated.` : `${data.name} is ready for anomaly detection.`;
+    message.className = 'form-message success';
+    clearForm(true);
+    await refreshEquipment();
+  } catch (error) {
+    message.textContent = error.message || 'Could not save this equipment. Check the values and video, then try again.';
+    message.className = 'form-message error-text';
+  } finally {
+    button.disabled = false;
+    cancelButton.disabled = false;
+  }
+});
+
 refreshEquipment();
-</script></body></html>
+</script>
+</body>
+</html>

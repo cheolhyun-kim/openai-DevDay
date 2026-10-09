@@ -1,0 +1,273 @@
+{
+  "schema_version": "devday.dataset/1",
+  "name": "current weak normal and coin 120fps development benchmark",
+  "minimum_gap_frames": 0,
+  "notes": [
+    "Capture FPS 120 is provisional from filenames and container metadata; confirm actual capture FPS before physical frequency claims.",
+    "Changed labels identify the coin experimental condition, not confirmed faults.",
+    "All recordings conservatively share one group because source/session independence is unverified."
+  ],
+  "recordings": [
+    {
+      "id": "normal_01",
+      "path": "input/미풍_정상_120/미풍_정상_120_01.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "normal_02",
+      "path": "input/미풍_정상_120/미풍_정상_120_02.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "normal_03",
+      "path": "input/미풍_정상_120/미풍_정상_120_03.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "normal_04",
+      "path": "input/미풍_정상_120/미풍_정상_120_04.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "normal_05",
+      "path": "input/미풍_정상_120/미풍_정상_120_05.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "normal_06",
+      "path": "input/미풍_정상_120/미풍_정상_120_06.MOV",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_01",
+      "path": "input/미풍_동전_120/미풍_동전_120_01.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_02",
+      "path": "input/미풍_동전_120/미풍_동전_120_02.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_03",
+      "path": "input/미풍_동전_120/미풍_동전_120_03.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_04",
+      "path": "input/미풍_동전_120/미풍_동전_120_04.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_05",
+      "path": "input/미풍_동전_120/미풍_동전_120_05.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "coin_06",
+      "path": "input/미풍_동전_120/미풍_동전_120_06.MOV",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "unverified-shared-session-current-120",
+      "capture_fps": 120,
+      "frame_preservation_verified": false
+    }
+  ],
+  "clips": [
+    {
+      "id": "normal_01",
+      "recording_id": "normal_01",
+      "start_frame": 0,
+      "end_frame": 525
+    },
+    {
+      "id": "normal_02",
+      "recording_id": "normal_02",
+      "start_frame": 0,
+      "end_frame": 573
+    },
+    {
+      "id": "normal_03",
+      "recording_id": "normal_03",
+      "start_frame": 0,
+      "end_frame": 511
+    },
+    {
+      "id": "normal_04",
+      "recording_id": "normal_04",
+      "start_frame": 0,
+      "end_frame": 552
+    },
+    {
+      "id": "normal_05",
+      "recording_id": "normal_05",
+      "start_frame": 0,
+      "end_frame": 511
+    },
+    {
+      "id": "normal_06",
+      "recording_id": "normal_06",
+      "start_frame": 0,
+      "end_frame": 532
+    },
+    {
+      "id": "coin_01",
+      "recording_id": "coin_01",
+      "start_frame": 0,
+      "end_frame": 552
+    },
+    {
+      "id": "coin_02",
+      "recording_id": "coin_02",
+      "start_frame": 0,
+      "end_frame": 551
+    },
+    {
+      "id": "coin_03",
+      "recording_id": "coin_03",
+      "start_frame": 0,
+      "end_frame": 551
+    },
+    {
+      "id": "coin_04",
+      "recording_id": "coin_04",
+      "start_frame": 0,
+      "end_frame": 551
+    },
+    {
+      "id": "coin_05",
+      "recording_id": "coin_05",
+      "start_frame": 0,
+      "end_frame": 551
+    },
+    {
+      "id": "coin_06",
+      "recording_id": "coin_06",
+      "start_frame": 0,
+      "end_frame": 551
+    }
+  ],
+  "cases": [
+    {
+      "id": "case01",
+      "reference_clip": "normal_01",
+      "candidate_clip": "normal_02",
+      "split": "dev",
+      "expected": "unchanged"
+    },
+    {
+      "id": "case02",
+      "reference_clip": "normal_01",
+      "candidate_clip": "normal_03",
+      "split": "dev",
+      "expected": "unchanged"
+    },
+    {
+      "id": "case03",
+      "reference_clip": "normal_01",
+      "candidate_clip": "normal_04",
+      "split": "dev",
+      "expected": "unchanged"
+    },
+    {
+      "id": "case04",
+      "reference_clip": "normal_01",
+      "candidate_clip": "normal_05",
+      "split": "dev",
+      "expected": "unchanged"
+    },
+    {
+      "id": "case05",
+      "reference_clip": "normal_01",
+      "candidate_clip": "normal_06",
+      "split": "dev",
+      "expected": "unchanged"
+    },
+    {
+      "id": "case06",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_01",
+      "split": "dev",
+      "expected": "changed"
+    },
+    {
+      "id": "case07",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_02",
+      "split": "dev",
+      "expected": "changed"
+    },
+    {
+      "id": "case08",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_03",
+      "split": "dev",
+      "expected": "changed"
+    },
+    {
+      "id": "case09",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_04",
+      "split": "dev",
+      "expected": "changed"
+    },
+    {
+      "id": "case10",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_05",
+      "split": "dev",
+      "expected": "changed"
+    },
+    {
+      "id": "case11",
+      "reference_clip": "normal_01",
+      "candidate_clip": "coin_06",
+      "split": "dev",
+      "expected": "changed"
+    }
+  ]
+}

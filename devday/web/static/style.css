@@ -286,3 +286,168 @@ td.nw, th.nw { white-space: nowrap; }
 .asset-copy span,.history-copy span { color:#61758e; }
 .check-option { color:#526880!important; }
 .check-option input { accent-color:#3478c9; }
+.form-actions { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+.form-cancel { padding:11px 16px;border:1px solid #cbd7e5;border-radius:999px;background:#fff;color:#49617a;font:inherit;font-size:12px;font-weight:650;cursor:pointer; }
+.form-cancel:hover { background:#f3f7fc;border-color:#9eb6d2; }
+.form-cancel:disabled { opacity:.5;cursor:not-allowed; }
+.current-reference { color:#3478c9!important;font-weight:600; }
+#cancel-edit[hidden],#current-reference[hidden] { display:none; }
+.asset-row .edit-equipment { border:0;background:none;padding:8px 0;color:#2869b7;font:inherit;font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap; }
+.asset-row .edit-equipment:hover { color:#174d8c;text-decoration:underline; }
+
+/* Larger text and wind-farm background for the landing screen */
+.hero-backdrop img { height:140%;filter:brightness(1.04) saturate(.88); }
+.hero-backdrop::after { background:linear-gradient(180deg,rgba(246,250,255,.14),rgba(238,246,255,.12) 50%,rgba(229,240,253,.22)); }
+.landing-nav { height:123px; }
+.hero { height:calc(100svh - 171px); }
+.landing-nav .brand { font-size:22.5px;letter-spacing:.035em; }
+.landing-nav .brand-name small { margin-top:7px;font-size:12px; }
+.landing-links { gap:clamp(27px,4.2vw,63px); }
+.landing-links a,.landing-links button { font-size:19.5px; }
+.landing-nav>.hero-cta { gap:24px;padding:16px 27px;min-height:65px;font-size:18px; }
+.landing-nav>.hero-cta span { font-size:24px; }
+.hero .hero-kicker { gap:15px;font-size:13.5px; }
+.hero .status-dot { width:9px;height:9px; }
+.hero h1 { font-size:clamp(81px,12vw,174px); }
+.hero-description { max-width:810px;font-size:21px; }
+.hero-secondary-cta { gap:39px;margin-top:36px;padding:20px 32px;font-size:19.5px; }
+.hero-secondary-cta span { width:35px;height:35px;font-size:24px; }
+.workflow-card { width:min(1080px,calc(100% - 64px));padding:23px 36px 26px; }
+.workflow-heading { gap:18px;margin-bottom:18px;font-size:12px; }
+.workflow-heading span+span { gap:10px; }
+.workflow-heading i { width:9px;height:9px; }
+.workflow-steps { grid-template-columns:1fr 39px 1fr 39px 1fr; }
+.workflow-steps>a { gap:16px; }
+.step-number { width:45px;height:45px;border-radius:13px;font-size:13.5px; }
+.workflow-steps strong { font-size:15px; }
+.workflow-steps small { font-size:12px; }
+.workflow-steps>a>b { font-size:19.5px; }
+.workflow-connector { min-width:20px; }
+
+@media (max-width:900px) {
+  .landing-nav { height:153px; }
+  .landing-links { gap:clamp(20px,4vw,42px); }
+  .hero { height:calc(100svh - 189px); }
+  .hero-copy { top:31%; }
+  .hero h1 { font-size:clamp(72px,12vw,120px); }
+  .workflow-card { width:calc(100% - 40px);bottom:18px;padding:18px 24px 20px; }
+  .workflow-steps { grid-template-columns:1fr 22px 1fr 22px 1fr; }
+  .workflow-steps>a { gap:10px; }
+  .workflow-steps>a>b { display:none; }
+  .step-number { width:34px;height:34px;font-size:11px; }
+  .workflow-steps strong { overflow:visible;font-size:13px;white-space:normal;text-overflow:clip; }
+  .workflow-steps small { overflow:visible;font-size:11px;white-space:normal;text-overflow:clip; }
+}
+@media (max-width:620px) {
+  .hero-backdrop img { height:140%;object-position:center top; }
+  .landing-nav { height:162px;gap:6px 9px;padding:0 15px; }
+  .landing-nav .brand { font-size:18px; }
+  .landing-nav .brand-name small { margin-top:5px;font-size:9px; }
+  .landing-nav>.hero-cta { min-height:54px;padding:13px 16px;gap:12px;font-size:13.5px; }
+  .landing-nav>.hero-cta span { font-size:18px; }
+  .landing-links { gap:6px;padding:2px 0 11px; }
+  .landing-links a,.landing-links button { font-size:13.5px; }
+  .hero { height:calc(100svh - 182px);min-height:660px; }
+  .hero-copy { top:32%;padding:0 12px; }
+  .hero .hero-kicker { gap:8px;font-size:9px;letter-spacing:.12em; }
+  .hero .status-dot { width:6px;height:6px; }
+  .hero h1 { margin:17px 0 14px;font-size:clamp(52px,13.5vw,78px); }
+  .hero-description { max-width:355px;font-size:16px; }
+  .hero-secondary-cta { gap:24px;margin-top:24px;padding:15px 24px;font-size:15px; }
+  .hero-secondary-cta span { width:27px;height:27px;font-size:18px; }
+  .workflow-card { width:calc(100% - 24px);bottom:12px;padding:15px 16px 17px; }
+  .workflow-heading { gap:8px;margin-bottom:11px;font-size:9px;letter-spacing:.1em; }
+  .workflow-heading span+span { font-size:8px; }
+  .workflow-heading i { width:7px;height:7px; }
+  .workflow-steps { grid-template-columns:1fr;gap:11px; }
+  .workflow-steps>a { gap:12px; }
+  .workflow-connector { display:none; }
+  .step-number { width:35px;height:35px;border-radius:10px;font-size:10px; }
+  .workflow-steps strong { font-size:10.5px; }
+  .workflow-steps small { font-size:9px; }
+}
+
+/* Landing page refinements: show the full photo and keep mobile controls legible. */
+.landing-shell { padding:24px; }
+.hero-backdrop { background:#82b8d8 url("/static/assets/wind-farm-background.jpg") center / cover no-repeat; }
+.hero-picture { position:absolute;inset:0;display:block; }
+.hero-backdrop img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(.88) saturate(.9); }
+.hero-backdrop::before { content:"";display:none;position:absolute;z-index:0;inset:-14px;background:url("/static/assets/wind-farm-background.jpg") center / cover no-repeat;filter:blur(16px) brightness(.82) saturate(.88); }
+.hero-backdrop::after { z-index:2;background:linear-gradient(180deg,rgba(15,48,77,.08),rgba(16,48,79,.12) 58%,rgba(14,43,70,.2)); }
+.site-panel { background:rgba(249,252,255,.28);backdrop-filter:blur(1px); }
+.landing-nav { height:106px;grid-template-columns:auto 1fr;gap:24px;padding-inline:clamp(24px,5vw,72px); }
+.landing-nav .brand { font-size:22.5px; }
+.brand-logo { display:block;height:42px;width:auto;flex:none;filter:drop-shadow(0 1px 4px rgba(16,48,79,.4)); }
+.landing-nav .brand-name small { margin-top:7px;color:#385a78;font-size:11px;letter-spacing:.16em; }
+.landing-links { justify-self:end;gap:clamp(22px,3.8vw,54px); }
+.landing-links a,.landing-links button { font-size:17px; }
+.hero { height:calc(100svh - 156px);min-height:540px; }
+.hero-copy { top:38%; }
+.hero .hero-kicker { font-size:12px; }
+.hero h1 { margin:16px 0 14px;font-size:clamp(48px,7.2vw,104px);line-height:.98; }
+.hero-description { max-width:690px;font-size:17px; }
+.hero-description p { font-size:clamp(16px,1.7vw,21px); }
+.hero-secondary-cta { gap:24px;margin-top:20px;padding:14px 23px;font-size:16px; }
+.hero-secondary-cta span { width:29px;height:29px;font-size:19px; }
+
+@media (max-width:900px) {
+  .landing-shell { padding:18px; }
+  .site-panel { min-height:calc(100svh - 36px); }
+  .landing-nav { height:112px;grid-template-columns:1fr;justify-items:start;align-content:center;gap:14px;padding:14px 28px; }
+  .landing-nav .brand-logo { height:40px; }
+  .landing-links { grid-column:auto;grid-row:auto;justify-self:start;justify-content:flex-start;gap:clamp(18px,4vw,34px);padding:0; }
+  .landing-links a,.landing-links button { font-size:15px; }
+  .hero { height:calc(100svh - 150px);min-height:520px; }
+  .hero-copy { top:36%; }
+  .hero h1 { font-size:clamp(52px,8vw,82px); }
+  .workflow-card { width:calc(100% - 44px);bottom:18px;padding:18px 22px 20px; }
+  .workflow-steps { grid-template-columns:1fr 22px 1fr 22px 1fr; }
+  .workflow-steps>a { gap:9px; }
+  .workflow-steps strong { font-size:12px; }
+  .workflow-steps small { font-size:10px; }
+}
+
+@media (max-width:620px) {
+  .landing-shell { padding:10px; }
+  .site-panel { min-height:calc(100svh - 20px);border-radius:20px; }
+  .hero-backdrop { background-image:url("/static/assets/wind-farm-mobile.jpg"); }
+  .hero-backdrop::before { display:none; }
+  .hero-backdrop img { object-fit:cover;object-position:center;filter:brightness(.88) saturate(.96); }
+  .landing-nav { height:auto;min-height:108px;grid-template-columns:1fr;justify-items:stretch;gap:13px;padding:16px 15px 12px; }
+  .landing-nav .brand { justify-self:start;font-size:18px; }
+  .landing-nav .brand-logo { height:40px; }
+  .landing-nav .brand-name small { margin-top:5px;font-size:8px;letter-spacing:.15em; }
+  .landing-links { display:flex;justify-content:space-between;gap:9px;width:100%;padding:0; }
+  .landing-links a,.landing-links button { font-size:clamp(10.5px,3.15vw,12.5px); }
+  .hero { height:calc(100svh - 142px);min-height:600px; }
+  .hero-copy { top:23%;padding:0 13px; }
+  .hero .hero-kicker { gap:7px;font-size:clamp(7px,2.05vw,8.5px);letter-spacing:.09em; }
+  .hero .status-dot { width:6px;height:6px; }
+  .hero h1 { margin:15px 0 13px;font-size:clamp(37px,11vw,48px);line-height:1;letter-spacing:-.065em; }
+  .hero-description { max-width:340px;font-size:13px;line-height:1.5; }
+  .hero-description p { font-size:15px; }
+  .hero-description br { display:none; }
+  .hero-secondary-cta { gap:17px;margin-top:17px;padding:12px 19px;font-size:14px; }
+  .hero-secondary-cta span { width:25px;height:25px;font-size:16px; }
+  .workflow-card { width:calc(100% - 28px);bottom:13px;padding:12px 14px 13px;border-radius:14px; }
+  .workflow-heading { gap:8px;margin-bottom:8px;font-size:8px;letter-spacing:.11em; }
+  .workflow-heading span+span { gap:6px;font-size:7px; }
+  .workflow-heading i { width:7px;height:7px; }
+  .workflow-steps { grid-template-columns:1fr;gap:8px; }
+  .workflow-steps>a { gap:9px; }
+  .workflow-connector { display:none; }
+  .step-number { width:30px;height:30px;border-radius:9px;font-size:9px; }
+  .workflow-steps strong { font-size:11.5px; }
+  .workflow-steps small { font-size:9.5px; }
+}
+
+@media (max-width:360px) {
+  .landing-nav .brand { font-size:16px; }
+  .landing-nav .brand-name small { font-size:7px; }
+  .landing-links { gap:6px; }
+  .landing-links a,.landing-links button { font-size:10px; }
+  .landing-nav .brand-logo { height:38px; }
+  .hero .hero-kicker { font-size:7px; }
+  .workflow-card { padding-inline:12px; }
+  .hero { min-height:560px; }
+}

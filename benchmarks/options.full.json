@@ -1,0 +1,11 @@
+{
+  "mode": "full",
+  "provider_kind": "openai",
+  "align_candidate": true,
+  "roi_repair_attempts": 1,
+  "diagnosis_repair_attempts": 1,
+  "conditions": {
+    "same_speed_confirmed": false,
+    "fixed_camera_confirmed": false
+  }
+}

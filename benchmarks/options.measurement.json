@@ -1,0 +1,8 @@
+{
+  "mode": "measurement",
+  "align_candidate": true,
+  "conditions": {
+    "same_speed_confirmed": false,
+    "fixed_camera_confirmed": false
+  }
+}

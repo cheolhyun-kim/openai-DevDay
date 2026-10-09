@@ -1,0 +1,117 @@
+{
+  "schema_version": "devday.dataset/1",
+  "name": "fan-poc",
+  "minimum_gap_frames": 0,
+  "recordings": [
+    {
+      "id": "weak_normal",
+      "path": "input/weak_normal.mov",
+      "speed": "weak",
+      "condition": "normal",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "weak_cover_removed_1",
+      "path": "input/weak_cover_removed_1.mov",
+      "speed": "weak",
+      "condition": "cover_removed_1",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "weak_cover_removed_2",
+      "path": "input/weak_cover_removed_2.mov",
+      "speed": "weak",
+      "condition": "cover_removed_2",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "weak_coin",
+      "path": "input/weak_coin.mov",
+      "speed": "weak",
+      "condition": "coin",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "medium_normal",
+      "path": "input/medium_normal.mov",
+      "speed": "medium",
+      "condition": "normal",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "medium_cover_removed_1",
+      "path": "input/medium_cover_removed_1.mov",
+      "speed": "medium",
+      "condition": "cover_removed_1",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "medium_cover_removed_2",
+      "path": "input/medium_cover_removed_2.mov",
+      "speed": "medium",
+      "condition": "cover_removed_2",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "medium_coin",
+      "path": "input/medium_coin.mov",
+      "speed": "medium",
+      "condition": "coin",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "strong_normal",
+      "path": "input/strong_normal.mov",
+      "speed": "strong",
+      "condition": "normal",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "strong_cover_removed_1",
+      "path": "input/strong_cover_removed_1.mov",
+      "speed": "strong",
+      "condition": "cover_removed_1",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "strong_cover_removed_2",
+      "path": "input/strong_cover_removed_2.mov",
+      "speed": "strong",
+      "condition": "cover_removed_2",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    },
+    {
+      "id": "strong_coin",
+      "path": "input/strong_coin.mov",
+      "speed": "strong",
+      "condition": "coin",
+      "group_id": "session-01",
+      "capture_fps": null,
+      "frame_preservation_verified": false
+    }
+  ],
+  "clips": [],
+  "cases": []
+}

@@ -7,6 +7,8 @@ settings.py
 results/
 input/*
 !input/README.txt
+benchmarks/input/*
+!benchmarks/input/README.txt
 web_jobs/
 logs/
 .devday_access_code
