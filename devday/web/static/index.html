@@ -3,16 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b0d10">
-<title>RotorSense · Industrial Equipment Diagnostics</title>
+<meta name="theme-color" content="#07111f">
+<title>RotorIQ · Motion Intelligence</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="landing-body">
 <main class="landing-shell">
+  <div class="hero-backdrop" aria-hidden="true">
+    <img src="/static/assets/operations-sky.jpg" alt="">
+    <div class="backdrop-grid"></div>
+  </div>
+  <div class="site-panel">
   <header class="landing-nav">
-    <a class="brand" href="/" aria-label="RotorSense home">
+    <a class="brand" href="/" aria-label="RotorIQ home">
       <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
-      <span>ROTOR<span class="brand-light">SENSE</span><small>INDUSTRIAL INTELLIGENCE</small></span>
+      <span class="brand-name">ROTOR<span class="brand-divider">IQ</span><small>MOTION INTELLIGENCE</small></span>
     </a>
     <nav class="landing-links" aria-label="Main navigation">
       <button type="button" id="about-open">About</button>
@@ -23,24 +28,32 @@
   </header>
 
   <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-kicker"><span class="status-dot"></span> VIDEO-BASED CONDITION MONITORING</div>
-    <h1 id="hero-title">Industrial Rotating<br><span>Equipment Diagnostics</span></h1>
-    <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
-    <div class="hero-image-glow"></div>
-    <img class="hero-fan" src="/static/assets/fan-hero.png" alt="Industrial fan used for rotating equipment diagnostics">
-    <div class="hero-description">
-      <p>See what the eye can’t.<br>Understand how your equipment moves.</p>
-      <span>Register a healthy reference once, then compare every inspection against it.</span>
+    <div class="hero-copy">
+    <div class="hero-kicker"><span class="status-dot"></span> MOTION INTELLIGENCE FOR ROTATING EQUIPMENT</div>
+      <h1 id="hero-title">Every machine<br><span>has a rhythm.</span></h1>
+      <p class="hero-description">Compare inspection video with a healthy reference.<br>See when your machine’s motion changes.</p>
+      <a class="hero-secondary-cta" href="/diagnose">Detect Anomaly <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="workflow-card" aria-label="How RotorIQ works">
+      <div class="workflow-heading"><span>THE INSPECTION FLOW</span><span><i></i> READY WHEN YOU ARE</span></div>
+      <div class="workflow-steps">
+        <a href="/equipment"><span class="step-number">01</span><span><strong>Register equipment</strong><small>Add a healthy reference video</small></span><b aria-hidden="true">↗</b></a>
+        <div class="workflow-connector" aria-hidden="true"></div>
+        <a href="/diagnose"><span class="step-number">02</span><span><strong>Inspect a machine</strong><small>Upload the video to compare</small></span><b aria-hidden="true">↗</b></a>
+        <div class="workflow-connector" aria-hidden="true"></div>
+        <a href="/history"><span class="step-number">03</span><span><strong>Review the signal</strong><small>Open a past analysis</small></span><b aria-hidden="true">↗</b></a>
+      </div>
     </div>
   </section>
+  </div>
 </main>
 
 <dialog class="about-dialog" id="about-dialog" aria-labelledby="about-title">
   <button class="dialog-close" id="about-close" aria-label="Close">×</button>
-  <div class="hero-kicker"><span class="status-dot"></span> ABOUT ROTORSENSE</div>
-  <h2 id="about-title">A clearer view of<br>rotating equipment.</h2>
-  <p>RotorSense compares slow-motion video of industrial equipment with a registered healthy reference. It measures visible motion by component and frequency band to help teams spot changes worth inspecting.</p>
-  <p class="about-note">Video-based screening supports inspection. It does not confirm a fault or replace calibrated vibration instruments.</p>
+  <div class="hero-kicker"><span class="status-dot"></span> ABOUT ROTORIQ</div>
+  <h2 id="about-title">A closer look<br>at machine motion.</h2>
+  <p>RotorIQ compares video of rotating equipment with a healthy reference recording. It measures visible movement across components and frequency bands to help teams identify changes for closer inspection.</p>
+  <p class="about-note">Video based screening supports inspection. It does not replace calibrated vibration instruments.</p>
 </dialog>
 <script>
 const aboutDialog = document.getElementById('about-dialog');
