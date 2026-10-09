@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: devday-vibration-diagnosis
+    runtime: python
+    plan: 1c-2g
+    region: singapore
+    branch: main
+    buildCommand: pip install -e .
+    startCommand: python web.py --lan --no-browser
+    autoDeployTrigger: commit
+    healthCheckPath: /login
+    disk:
+      name: devday-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: DEVDAY_DATA_DIR
+        value: /var/data
+      - key: DEVDAY_PROVIDER
+        value: openai
+      - key: DEVDAY_MODEL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DEVDAY_ACCESS_CODE
+        sync: false
