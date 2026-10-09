@@ -13,6 +13,7 @@ import shutil
 import threading
 import time
 import uuid
+import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
@@ -20,7 +21,7 @@ from pathlib import Path
 import cv2
 from urllib.parse import quote
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from ..workflow import run_pipeline
@@ -28,6 +29,7 @@ from ..workflow import run_pipeline
 STATIC = Path(__file__).parent / 'static'
 VIDEO_EXT = {'.mov', '.mp4', '.m4v', '.avi'}
 SERVE_EXT = {'.png', '.jpg', '.jpeg', '.json', '.html', '.txt'}
+ARCHIVE_EXCLUDE = {'input', 'frames', 'frames.json'}
 JOB_ID = re.compile(r'^\d{8}-\d{6}-[0-9a-f]{6}$')
 STAGES = [('frames', '대표 장면 추출'), ('roi_api', 'AI가 측정할 부위 고르기'), ('alignment', '두 영상 위치 맞추기'),
           ('measurement_reference', '정상 영상 흔들림 측정'), ('measurement_candidate', '점검 영상 흔들림 측정'),
@@ -309,6 +311,26 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
         if run not in target.parents or target.suffix.lower() not in SERVE_EXT or not target.is_file():
             raise HTTPException(404, '파일을 찾을 수 없어요.')
         return FileResponse(target)
+
+    @app.get('/api/jobs/{job_id}/archive')
+    def job_archive(job_id: str):
+        """Download the analysis record without the uploaded videos or extracted source frames."""
+        d = store.dir(job_id)
+        memory = __import__('io').BytesIO()
+        with zipfile.ZipFile(memory, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+            for base in (d / 'job.json', d / 'run'):
+                if not base.exists():
+                    continue
+                paths = [base] if base.is_file() else sorted(p for p in base.rglob('*') if p.is_file())
+                for path in paths:
+                    rel = path.relative_to(d)
+                    if any(part in ARCHIVE_EXCLUDE for part in rel.parts):
+                        continue
+                    archive.write(path, arcname=Path(job_id) / rel)
+        memory.seek(0)
+        return StreamingResponse(memory, media_type='application/zip', headers={
+            'Content-Disposition': f'attachment; filename="devday-analysis-{job_id}.zip"'
+        })
 
     app.state.store = store; app.state.executor = executor
     return app

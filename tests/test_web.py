@@ -1,6 +1,7 @@
 """Web app: upload -> background job -> results payload, using the synthetic videos and fake provider."""
 import io
 import json
+import zipfile
 import tempfile
 import time
 import unittest
@@ -47,6 +48,13 @@ class WebAppTests(unittest.TestCase):
                 self.assertEqual(client.get(f'/api/jobs/{job_id}/files/../job.json').status_code, 404)
                 self.assertEqual(client.get(f'/jobs/{job_id}').status_code, 200)
                 self.assertEqual(client.get('/api/jobs').json()[0]['label'], 'abnormal')
+                archive_response = client.get(f'/api/jobs/{job_id}/archive')
+                self.assertEqual(archive_response.status_code, 200)
+                with zipfile.ZipFile(io.BytesIO(archive_response.content)) as archive:
+                    names = archive.namelist()
+                    self.assertTrue(any(name.endswith('/run/evidence.json') for name in names))
+                    self.assertTrue(any(name.endswith('/run/decision.json') for name in names))
+                    self.assertFalse(any('/input/' in name or '/frames/' in name for name in names))
                 self.assertEqual(client.get('/api/jobs/not-a-job').status_code, 404)
 
     def test_rejects_non_video_and_reports_provider_failure(self):

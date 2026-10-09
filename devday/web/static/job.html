@@ -108,7 +108,8 @@ function infoCard(r) {
     <dt>AI 호출</dt><dd>${esc(r.mode || '')} · ${esc(tokens || '-')}</dd></dl>
     ${r.limitations?.length ? `<details style="margin-top:12px"><summary>AI가 적은 한계</summary><ul class="plain">${r.limitations.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>` : ''}
     ${r.recommended_validation?.length ? `<details><summary>추가 확인 방법</summary><ul class="plain">${r.recommended_validation.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>` : ''}
-    <p class="links" style="margin-top:12px">${r.files.map(f => `<a href="${fileUrl(f)}" target="_blank">${esc(f)}</a>`).join('')}</p></section>`;
+    <p class="links" style="margin-top:12px"><a class="download" href="/api/jobs/${jobId}/archive">분석 기록 전체 다운로드 (영상 제외)</a></p>
+    <p class="links">${r.files.map(f => `<a href="${fileUrl(f)}" target="_blank">${esc(f)}</a>`).join('')}</p></section>`;
 }
 
 function galleryCard(r) {
