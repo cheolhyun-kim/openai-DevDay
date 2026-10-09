@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_DIR="/Users/kimcheolhyun/Desktop/DevDay-review/DevDay"
+APP_DIR="$(cd "$(dirname "$0")" && pwd)"
 BRANCH="main"
 PORT="8001"
 LOG_DIR="$APP_DIR/logs"
