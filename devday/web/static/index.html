@@ -10,12 +10,16 @@
 <body class="landing-body">
 <main class="landing-shell">
   <div class="hero-backdrop" aria-hidden="true">
-    <img src="/static/assets/wind-farm-background.jpg" alt="">
+    <picture class="hero-picture">
+      <source media="(max-width: 620px)" srcset="/static/assets/wind-farm-mobile.jpg">
+      <img src="/static/assets/wind-farm-background.jpg" alt="">
+    </picture>
     <div class="backdrop-grid"></div>
   </div>
   <div class="site-panel">
   <header class="landing-nav">
     <a class="brand" href="/" aria-label="Wi-ing Wi-ing home">
+      <img class="brand-logo" src="/static/assets/prometheus-logo.png" alt="">
       <span class="brand-name">Wi-ing Wi-ing<small>GENIUSES, OBVIOUSLY</small></span>
     </a>
     <nav class="landing-links" aria-label="Main navigation">

@@ -367,12 +367,14 @@ td.nw, th.nw { white-space: nowrap; }
 /* Landing page refinements: show the full photo and keep mobile controls legible. */
 .landing-shell { padding:24px; }
 .hero-backdrop { background:#82b8d8 url("/static/assets/wind-farm-background.jpg") center / cover no-repeat; }
+.hero-picture { position:absolute;inset:0;display:block; }
 .hero-backdrop img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(.88) saturate(.9); }
 .hero-backdrop::before { content:"";display:none;position:absolute;z-index:0;inset:-14px;background:url("/static/assets/wind-farm-background.jpg") center / cover no-repeat;filter:blur(16px) brightness(.82) saturate(.88); }
 .hero-backdrop::after { z-index:2;background:linear-gradient(180deg,rgba(15,48,77,.08),rgba(16,48,79,.12) 58%,rgba(14,43,70,.2)); }
 .site-panel { background:rgba(249,252,255,.28);backdrop-filter:blur(1px); }
 .landing-nav { height:106px;grid-template-columns:auto 1fr;gap:24px;padding-inline:clamp(24px,5vw,72px); }
 .landing-nav .brand { font-size:22.5px; }
+.brand-logo { display:block;height:42px;width:auto;flex:none;filter:drop-shadow(0 1px 4px rgba(16,48,79,.4)); }
 .landing-nav .brand-name small { margin-top:7px;color:#385a78;font-size:11px;letter-spacing:.16em; }
 .landing-links { justify-self:end;gap:clamp(22px,3.8vw,54px); }
 .landing-links a,.landing-links button { font-size:17px; }
@@ -389,6 +391,7 @@ td.nw, th.nw { white-space: nowrap; }
   .landing-shell { padding:18px; }
   .site-panel { min-height:calc(100svh - 36px); }
   .landing-nav { height:112px;grid-template-columns:1fr;justify-items:start;align-content:center;gap:14px;padding:14px 28px; }
+  .landing-nav .brand-logo { height:40px; }
   .landing-links { grid-column:auto;grid-row:auto;justify-self:start;justify-content:flex-start;gap:clamp(18px,4vw,34px);padding:0; }
   .landing-links a,.landing-links button { font-size:15px; }
   .hero { height:calc(100svh - 150px);min-height:520px; }
@@ -404,11 +407,12 @@ td.nw, th.nw { white-space: nowrap; }
 @media (max-width:620px) {
   .landing-shell { padding:10px; }
   .site-panel { min-height:calc(100svh - 20px);border-radius:20px; }
-  .hero-backdrop::before { display:block; }
-  .hero-backdrop img { object-fit:contain;object-position:center 63%; }
-  .hero-backdrop img { -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,#000 7%,#000 93%,transparent 100%); }
+  .hero-backdrop { background-image:url("/static/assets/wind-farm-mobile.jpg"); }
+  .hero-backdrop::before { display:none; }
+  .hero-backdrop img { object-fit:cover;object-position:center;filter:brightness(.88) saturate(.96); }
   .landing-nav { height:auto;min-height:108px;grid-template-columns:1fr;justify-items:stretch;gap:13px;padding:16px 15px 12px; }
   .landing-nav .brand { justify-self:start;font-size:18px; }
+  .landing-nav .brand-logo { height:40px; }
   .landing-nav .brand-name small { margin-top:5px;font-size:8px;letter-spacing:.15em; }
   .landing-links { display:flex;justify-content:space-between;gap:9px;width:100%;padding:0; }
   .landing-links a,.landing-links button { font-size:clamp(10.5px,3.15vw,12.5px); }
@@ -439,7 +443,7 @@ td.nw, th.nw { white-space: nowrap; }
   .landing-nav .brand-name small { font-size:7px; }
   .landing-links { gap:6px; }
   .landing-links a,.landing-links button { font-size:10px; }
-  .hero-backdrop img { object-position:center 60%; }
+  .landing-nav .brand-logo { height:38px; }
   .hero .hero-kicker { font-size:7px; }
   .workflow-card { padding-inline:12px; }
   .hero { min-height:560px; }
