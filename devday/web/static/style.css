@@ -553,3 +553,9 @@ td.nw, th.nw { white-space: nowrap; }
   .job-page .verdict .big { font-size:32px; }
   .job-page .check { gap:10px; }
 }
+.asset-actions { display:flex;align-items:center;gap:14px;flex:none; }
+.asset-actions button { border:0;background:none;padding:8px 2px;font:inherit;cursor:pointer; }
+.asset-actions button:disabled { opacity:.55;cursor:wait; }
+.text-link.delete-equipment { color:#b34545; }
+.text-link.delete-equipment:hover { color:#8c2d35; }
+@media (max-width:620px) { .asset-actions { gap:9px; }.asset-actions button { padding:8px 1px; } }

@@ -459,6 +459,16 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
             raise
         return item
 
+    @app.delete('/api/equipment/{equipment_id}')
+    def delete_equipment(equipment_id: str):
+        with store.lock:
+            folder=equipment_dir(equipment_id)
+            active=[m for m in store.all() if (m.get('equipment') or {}).get('id')==equipment_id and m.get('state') in ('queued','running')]
+            if active:
+                raise HTTPException(409,'This equipment is used by a queued or running inspection. Wait for it to finish, then try again.')
+            shutil.rmtree(folder)
+        return {'id':equipment_id,'deleted':True}
+
     @app.post('/api/jobs/from-equipment')
     def create_equipment_job(equipment_id: str = Form(...), candidate: UploadFile = File(...),
                              same_speed: bool = Form(False), fixed_camera: bool = Form(False)):
@@ -482,8 +492,20 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
                   'inputs':{'normal':normal_input,'candidate':candidate_input},'equipment':{'id':item['id'],'name':item['name'],'model':item.get('model','')},
                   'capture_fps':capture_fps,'same_speed':same_speed,'fixed_camera':fixed_camera,
                   'warnings':warnings+item.get('warnings',[]),'provider':provider_info or {}}
-            (d/'job.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
-            executor.submit(run_job,job_id)
+            with store.lock:
+                # Recheck while holding the same lock as deletion: queued work keeps its reference alive.
+                folder=equipment_dir(equipment_id)
+                item=json.loads((folder/'equipment.json').read_text(encoding='utf-8'))
+                latest_normal=item.get('normal') or {}
+                latest_name=Path(latest_normal.get('stored','')).name
+                latest_path=(folder/latest_name).resolve()
+                if not latest_name or folder.resolve() not in latest_path.parents or not latest_path.is_file():
+                    raise HTTPException(400,'The saved healthy reference video is missing. Re-register this equipment.')
+                meta['inputs']['normal']={**latest_normal,'source':'registered-equipment'}
+                meta['equipment']={'id':item['id'],'name':item['name'],'model':item.get('model','')}
+                meta['warnings']=warnings+item.get('warnings',[])
+                (d/'job.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+                executor.submit(run_job,job_id)
             return {'id':job_id,'url':f'/jobs/{job_id}','warnings':meta['warnings']}
         except Exception:
             shutil.rmtree(d,ignore_errors=True)

@@ -59,6 +59,7 @@
       <a class="text-link" href="/diagnose">Go to anomaly detection ↗</a>
     </div>
     <div id="equipment-list" class="asset-list"><p class="muted">Loading equipment…</p></div>
+    <div id="equipment-message" class="form-message" role="status"></div>
   </section>
 </main>
 
@@ -68,6 +69,7 @@ const form = document.getElementById('equipment-form');
 const button = document.getElementById('save-equipment');
 const cancelButton = document.getElementById('cancel-edit');
 const message = document.getElementById('form-message');
+const equipmentMessage = document.getElementById('equipment-message');
 const list = document.getElementById('equipment-list');
 const videoInput = document.getElementById('reference-video');
 const referenceHelp = document.getElementById('reference-help');
@@ -121,7 +123,10 @@ async function refreshEquipment() {
           <span>${esc(item.model || 'Industrial equipment')} · ${esc(item.capture_fps)} FPS</span>
           <small>Reference: ${esc(item.normal?.filename || 'Healthy video')}</small>
         </div>
-        <button class="text-link edit-equipment" type="button" data-edit-id="${esc(item.id)}">Edit <span aria-hidden="true">↗</span></button>
+        <div class="asset-actions">
+          <button class="text-link edit-equipment" type="button" data-edit-id="${esc(item.id)}">Edit <span aria-hidden="true">↗</span></button>
+          <button class="text-link delete-equipment" type="button" data-delete-id="${esc(item.id)}">Delete</button>
+        </div>
       </article>`).join('') : '<p class="muted">No equipment registered yet. Add a healthy reference to get started.</p>';
   } catch (_) {
     equipmentItems = [];
@@ -130,6 +135,29 @@ async function refreshEquipment() {
 }
 
 list.addEventListener('click', event => {
+  const deleteButton = event.target.closest('[data-delete-id]');
+  if (deleteButton) {
+    const item = equipmentItems.find(equipment => equipment.id === deleteButton.dataset.deleteId);
+    if (!item || !confirm(`Delete ${item.name} and its saved healthy reference video? Past analysis records will be kept.`)) return;
+    deleteButton.disabled = true;
+    equipmentMessage.textContent = `Deleting ${item.name}…`;
+    equipmentMessage.className = 'form-message';
+    fetch(`/api/equipment/${encodeURIComponent(item.id)}`, { method: 'DELETE' })
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Could not delete this equipment.');
+        if (editingId === item.id) clearForm();
+        equipmentMessage.textContent = `${item.name} was deleted.`;
+        equipmentMessage.className = 'form-message success';
+        await refreshEquipment();
+      })
+      .catch(error => {
+        equipmentMessage.textContent = error.message || 'Could not delete this equipment.';
+        equipmentMessage.className = 'form-message error-text';
+      })
+      .finally(() => { deleteButton.disabled = false; });
+    return;
+  }
   const editButton = event.target.closest('[data-edit-id]');
   if (!editButton) return;
   const item = equipmentItems.find(equipment => equipment.id === editButton.dataset.editId);
