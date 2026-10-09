@@ -166,7 +166,12 @@ def build_results(run_dir):
                        ('measurements/candidate/roi.png', '점검 영상 측정 부위')]:
         if (run / rel).is_file(): images.append({'path': rel, 'title': title})
     for p in sorted((run / 'visuals').glob('heatmap_*.png')):
-        images.append({'path': f'visuals/{p.name}', 'title': f'측정 지도 ({p.stem.replace("heatmap_", "")} 대역)'})
+        band_id = p.stem.replace('heatmap_', '')
+        row = next((x for x in evidence.get('region_comparisons', []) if x['evidence_id'].endswith(':' + band_id)), {})
+        hz = row.get('band_hz') or []
+        label = '낮은 주파수' if band_id in ('low', 'lower') else '높은 주파수' if band_id in ('higher', 'high') else f'{band_id} 대역'
+        span = f' · {hz[0]:g}–{hz[1]:g} Hz' if len(hz) == 2 else ''
+        images.append({'path': f'visuals/{p.name}', 'title': f'흔들림 지도 · {label}{span}'})
     if (run / 'visuals/spectrum_comparison.png').is_file():
         images.append({'path': 'visuals/spectrum_comparison.png', 'title': '주파수별 흔들림 비교'})
     usage = [{'stage': c.get('stage'), 'model': c.get('model'), 'usage': c.get('usage')} for c in result.get('model_calls', [])]

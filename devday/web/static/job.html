@@ -87,24 +87,30 @@ function checksCard(r) {
       <p class="note">흔들림이 커진 위치가 곧 고장 원인이라는 뜻은 아니에요.</p></section>`;
 }
 
+function relativeComparisonCard(r) {
+  const rows = r.table.filter(t => t.id.startsWith('relative:') && t.used && Number.isFinite(t.ratio))
+    .sort((a,b) => Math.abs(b.ratio-1)-Math.abs(a.ratio-1)).slice(0,5);
+  if (!rows.length) return '';
+  const scale = Math.max(2, ...rows.map(t => Math.abs(t.ratio)));
+  const lines = rows.map(t => {
+    const width = Math.max(2, Math.min(100, Math.abs(t.ratio-1)/Math.max(scale-1,1)*100));
+    const direction = t.ratio >= 1 ? 'candidate-increase' : 'candidate-decrease';
+    return `<tr><td>${esc(t.part)}</td><td>${esc(t.band)}</td><td class="num">${fmtNum(t.ratio,2)}×</td><td><span class="relative-bar ${direction}" style="width:${width}%"></span></td></tr>`;
+  }).join('');
+  return `<details class="card"><summary>주요 상대 움직임 비교 보기</summary>
+    <p class="note">두 부위의 흔들림 차이가 정상 영상에 비해 확인 영상에서 얼마나 달라졌는지 보여줍니다. 1배는 변화 없음, 1배보다 크면 차이가 커진 것, 1배보다 작으면 줄어든 것입니다. 이는 화면에서 측정한 상대 움직임이며 고장 확률은 아닙니다.</p>
+    <div class="scroll"><table><tr><th>비교 부위</th><th>주파수 대역</th><th class="num">확인/정상 배율</th><th>변화 크기</th></tr>${lines}</table></div></details>`;
+}
+
 function spectrumCard(r) {
   const img = r.images.find(i => i.path === 'visuals/spectrum_comparison.png');
   if (!img) return '';
-  return `<section class="card"><h2>주파수별 흔들림 비교</h2>
-    <figure class="spectrum"><a href="${fileUrl(img.path)}" target="_blank"><img src="${fileUrl(img.path)}" alt="부위별 정상 영상과 점검 영상의 주파수 스펙트럼 비교" loading="lazy"></a>
-    <figcaption>가로축은 주파수(Hz), 세로축은 영상에서 측정한 움직임 에너지예요. 파란색은 정상 영상, 빨간색은 점검 영상입니다. 음영은 선택된 측정 대역이에요.</figcaption></figure>
-    <p class="note">점검 영상의 선이 높으면 해당 주파수에서 화면 움직임이 더 크게 측정된 것입니다. 이것만으로 고장이나 원인 위치가 확정되지는 않아요.</p></section>`;
+  return `<details class="card"><summary>주파수별 흔들림 비교 보기</summary><p class="note">가로축은 주파수(Hz), 세로축은 영상에서 측정한 움직임의 크기입니다. 파란 선은 정상 영상, 빨간 선은 확인할 영상입니다. 같은 주파수에서 빨간 선이 더 높으면 그 주기의 흔들림이 더 크게 측정된 것입니다. 봉우리가 나타나는 구간에서 흔들림이 두드러집니다. 촬영 조건이나 배경 흔들림도 영향을 줄 수 있으므로 봉우리만으로 고장 원인을 확정할 수는 없습니다.</p><figure class="spectrum"><a href="${fileUrl(img.path)}" target="_blank"><img src="${fileUrl(img.path)}" alt="주파수별 흔들림 비교" loading="lazy"></a></figure></details>`;
 }
 
 function tableCard(r) {
-  const rows = r.table.map(t => `<tr class="${t.used ? '' : 'unused'}"><td>${esc(t.part)}</td><td class="nw">${esc(t.band)}</td>
-    <td class="num">${fmtNum(t.reference_px, 4)}</td><td class="num">${fmtNum(t.candidate_px, 4)}</td>
-    <td class="num">${fmtNum(t.ratio, 2)}</td><td class="num">${fmtNum(t.z, 2)}</td>
-    <td class="num">${fmtNum(t.reference_snr, 1)} / ${fmtNum(t.candidate_snr, 1)}</td>
-    <td class="${t.flag === 'increase' ? 'flag-increase' : ''}">${esc(t.flag_ko)}${t.used ? '' : ' · 판단 제외'}</td></tr>`).join('');
-  return `<section class="card"><h2>부위별 측정값</h2><div class="scroll"><table>
-    <tr><th>부위</th><th>대역</th><th class="num">정상(px)</th><th class="num">점검(px)</th><th class="num">배율</th><th class="num">z</th><th class="num">신호/잡음</th><th>규칙</th></tr>${rows}</table></div>
-    <p class="note">px = 화면 픽셀 단위 흔들림(RMS). 회색 줄은 추적 점이 부족하거나 배경 잡음 수준, AI가 신뢰도 낮음으로 표시해 판단에서 뺀 부위예요.</p></section>`;
+  const rows = r.table.map(t => `<tr class="${t.used ? '' : 'unused'}"><td>${esc(t.part)}</td><td class="nw">${esc(t.band)}</td><td class="num">${fmtNum(t.reference_px, 4)}</td><td class="num">${fmtNum(t.candidate_px, 4)}</td><td class="num">${fmtNum(t.ratio, 2)}</td><td class="num">${fmtNum(t.z, 2)}</td><td class="num">${fmtNum(t.reference_snr, 1)} / ${fmtNum(t.candidate_snr, 1)}</td><td>${esc(t.flag_ko)}${t.used ? '' : ' · 판정 제외'}</td></tr>`).join('');
+  return `<details class="card"><summary>부위별 측정값 보기</summary><p class="note">정상 영상과 확인할 영상의 화면 흔들림(px RMS), 비율, z 점수를 비교합니다. 제외된 지점은 판정에 사용하지 않습니다. px는 화면 픽셀 기준의 흔들림 크기입니다.</p><div class="scroll"><table><tr><th>부위</th><th>대역</th><th>정상(px)</th><th>확인(px)</th><th>비율</th><th>z</th><th>신호/노이즈</th><th>기준</th></tr>${rows}</table></div></details>`;
 }
 
 function infoCard(r) {
@@ -126,8 +132,8 @@ function infoCard(r) {
 function galleryCard(r) {
   const imgs = r.images.filter(i => !['visuals/inspection_roi.png','visuals/spectrum_comparison.png'].includes(i.path));
   if (!imgs.length) return '';
-  return `<section class="card"><h2>측정 화면</h2><div class="gallery">${imgs.map(i => `<figure class="${i.path.includes('heatmap') ? 'wide' : ''}"><a href="${fileUrl(i.path)}" target="_blank"><img src="${fileUrl(i.path)}" alt="${esc(i.title)}" loading="lazy"></a><figcaption>${esc(i.title)}</figcaption></figure>`).join('')}</div>
-    <p class="note">측정 지도는 코드가 측정값으로 그린 그림이에요. 고장 확률이 아니에요.</p></section>`;
+  const figures = imgs.map(i => `<figure class="${i.path.includes('heatmap') ? 'wide' : ''}"><a href="${fileUrl(i.path)}" target="_blank"><img src="${fileUrl(i.path)}" alt="${esc(i.title)}" loading="lazy"></a><figcaption>${esc(i.title)}</figcaption></figure>`).join('');
+  return `<section class="card"><h2>측정 화면</h2><p class="note">각 지도는 왼쪽부터 기준 영상(Reference), 확인 영상(Candidate), 두 영상의 차이입니다. 기준·확인 지도는 같은 색상 범위를 사용하며 파랑에서 노랑으로 밝아질수록 움직임이 큽니다. 차이 지도는 파랑이 감소, 빨강이 증가입니다. 회색 X는 판정에서 제외한 지점입니다. low는 낮은 주파수 대역의 느린 흔들림, higher는 높은 대역의 빠른 떨림을 뜻합니다. 각 지도 제목에서 정확한 Hz 범위를 확인하세요. 색은 고장 확률이 아니라 화면 움직임(px RMS)입니다.</p><div class="gallery">${figures}</div></section>`;
 }
 
 async function poll() {
@@ -149,7 +155,7 @@ async function poll() {
     document.getElementById('demo-banner').hidden = !job.is_demo;
     document.getElementById('progress').hidden = true;
     const out = document.getElementById('result');
-    out.innerHTML = verdictCard(r) + citedCard(r) + checksCard(r) + spectrumCard(r) + tableCard(r) + galleryCard(r) + infoCard(r);
+    out.innerHTML = verdictCard(r) + checksCard(r) + relativeComparisonCard(r) + citedCard(r) + spectrumCard(r) + tableCard(r) + galleryCard(r) + infoCard(r);
     out.hidden = false;
     return;
   }
