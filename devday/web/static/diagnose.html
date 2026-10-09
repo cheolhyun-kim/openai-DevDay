@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detect Anomaly · RotorSense</title><link rel="stylesheet" href="/static/style.css"></head>
+<body class="app-body"><main class="app-shell">
+  <header class="app-top"><a class="brand app-brand" href="/"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span>ROTOR<span class="brand-light">SENSE</span><small>INDUSTRIAL INTELLIGENCE</small></span></a><nav><a href="/">Home</a><a href="/equipment">Register Equipment</a><a href="/history">Analysis History</a></nav></header>
+  <div class="app-heading"><div class="hero-kicker"><span class="status-dot"></span> CONDITION CHECK</div><h1>Detect Anomaly</h1><p>Select a registered asset, then upload only the video you want to inspect.</p></div>
+  <section class="app-card"><form id="diagnose-form" class="form-grid">
+    <label class="wide">Select equipment<select name="equipment_id" id="equipment-select" required><option value="">Loading equipment…</option></select><small id="reference-info">The saved healthy reference will be used for comparison.</small></label>
+    <label class="wide">Inspection video<input name="candidate" type="file" accept="video/*,.mov,.mp4,.m4v,.avi" required><small>Record the same part and camera angle as the healthy reference.</small></label>
+    <label class="check-option"><input type="checkbox" name="same_speed" checked> Same operating speed or setting as the reference</label>
+    <label class="check-option"><input type="checkbox" name="fixed_camera" checked> Camera was fixed during recording</label>
+    <div class="wide"><button id="run-diagnosis" class="hero-cta form-cta" type="submit" disabled>Analyze Inspection Video <span aria-hidden="true">↗</span></button><div id="diagnose-message" class="form-message" role="status"></div></div>
+    <div class="wide empty-assets" id="empty-assets" hidden>No equipment is registered yet. <a href="/equipment">Register equipment and add a healthy reference ↗</a></div>
+  </form></section>
+</main><script src="/static/common.js"></script><script>
+const select=document.getElementById('equipment-select'),info=document.getElementById('reference-info'),button=document.getElementById('run-diagnosis'),form=document.getElementById('diagnose-form'),message=document.getElementById('diagnose-message');let equipment=[];
+async function loadEquipment(){try{const res=await fetch('/api/equipment');equipment=await res.json();if(!equipment.length){select.innerHTML='<option value="">No equipment registered</option>';document.getElementById('empty-assets').hidden=false;button.disabled=true;return;}
+  select.innerHTML='<option value="">Choose an asset</option>'+equipment.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${x.model?' · '+esc(x.model):''}</option>`).join('');
+  const preselected=new URLSearchParams(location.search).get('equipment');if(preselected&&equipment.some(x=>x.id===preselected))select.value=preselected;updateInfo();
+}catch(_){select.innerHTML='<option value="">Could not load equipment</option>';message.textContent='Equipment list is unavailable. Refresh the page and try again.';}}
+function updateInfo(){const item=equipment.find(x=>x.id===select.value);info.textContent=item?`Healthy reference: ${item.normal?.filename||'Saved video'} · ${item.capture_fps} FPS`:'The saved healthy reference will be used for comparison.';button.disabled=!item;}
+select.addEventListener('change',updateInfo);
+form.addEventListener('submit',async e=>{e.preventDefault();if(!select.value)return;button.disabled=true;message.textContent='Uploading video…';message.className='form-message';
+  try{const res=await fetch('/api/jobs/from-equipment',{method:'POST',body:new FormData(form)}),data=await res.json();if(!res.ok)throw new Error(data.detail||'Could not start analysis.');location.href=data.url;}
+  catch(_){message.textContent='The video could not be submitted. Check the file and try again.';message.className='form-message error-text';button.disabled=false;}
+});
+loadEquipment();
+</script></body></html>

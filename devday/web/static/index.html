@@ -1,117 +1,54 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>흔들림 비교 진단</title>
+<meta name="theme-color" content="#0b0d10">
+<title>RotorSense · Industrial Equipment Diagnostics</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-<main>
-  <div class="home-heading"><div><div class="eyebrow">스마트폰 슬로모션 영상 · 설비 진동 비교</div>
-  <h1>흔들림 비교 진단</h1></div><a class="demo-link" href="/demo">데모 보기</a></div>
-  <p class="lead">정상일 때 찍은 영상과 점검할 영상을 올리면, AI가 측정할 부위를 고르고 코드가 흔들림을 재서 정상·비정상을 판정해요.</p>
+<body class="landing-body">
+<main class="landing-shell">
+  <header class="landing-nav">
+    <a class="brand" href="/" aria-label="RotorSense home">
+      <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
+      <span>ROTOR<span class="brand-light">SENSE</span><small>INDUSTRIAL INTELLIGENCE</small></span>
+    </a>
+    <nav class="landing-links" aria-label="Main navigation">
+      <button type="button" id="about-open">About</button>
+      <a href="/equipment">Register Equipment</a>
+      <a href="/history">Analysis History</a>
+    </nav>
+    <a class="hero-cta" href="/diagnose">Detect Anomaly <span aria-hidden="true">↗</span></a>
+  </header>
 
-  <form id="form" class="card">
-    <div class="grid2">
-      <label class="drop" id="drop-normal">
-        <input type="file" name="normal" accept="video/*,.mov,.mp4,.m4v">
-        <span class="title">① 정상 영상</span>
-        <span class="hint">정상으로 동작할 때 찍은 슬로모션 영상을<br>끌어다 놓거나 눌러서 고르세요</span>
-        <span class="file"></span>
-      </label>
-      <label class="drop" id="drop-candidate">
-        <input type="file" name="candidate" accept="video/*,.mov,.mp4,.m4v">
-        <span class="title">② 점검할 영상</span>
-        <span class="hint">같은 위치·같은 구도로 찍은<br>점검 대상 슬로모션 영상</span>
-        <span class="file"></span>
-      </label>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-kicker"><span class="status-dot"></span> VIDEO-BASED CONDITION MONITORING</div>
+    <h1 id="hero-title">Industrial Rotating<br><span>Equipment Diagnostics</span></h1>
+    <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+    <div class="hero-image-glow"></div>
+    <img class="hero-fan" src="/static/assets/fan-hero.png" alt="Industrial fan used for rotating equipment diagnostics">
+    <div class="hero-index"><span>01</span><span class="index-rule"></span><span>VISION-BASED ANALYSIS</span></div>
+    <div class="hero-description">
+      <p>See what the eye can’t.<br>Understand how your equipment moves.</p>
+      <span>Register a healthy reference once, then compare every inspection against it.</span>
     </div>
-    <div class="options">
-      <label>촬영 FPS <input type="number" name="capture_fps" value="240" min="1" step="any"></label>
-      <label><input type="checkbox" name="same_speed" checked> 같은 풍속(같은 설정)으로 찍었어요</label>
-      <label><input type="checkbox" name="fixed_camera" checked> 삼각대로 고정해서 찍었어요</label>
-    </div>
-    <p class="note">아이폰 슬로모션은 240fps 원본이 필요해요. 에어드롭에서 '모든 사진 데이터'를 켜고 보낸 파일을 올려주세요. 카카오톡 등으로 보낸 파일은 30fps로 바뀌어 빠른 흔들림을 놓칠 수 있어요.</p>
-    <div id="form-error"></div>
-    <button class="primary" id="submit" type="submit" disabled>분석 시작</button>
-    <div class="bar" id="upload-bar" hidden><div></div></div>
-    <div class="note" id="upload-text"></div>
-  </form>
-
-  <section class="card">
-    <h2>최근 분석</h2>
-    <ul class="jobs" id="jobs"><li class="note">아직 분석한 영상이 없어요.</li></ul>
+    <div class="hero-coordinate">ROTOR VISION<br>FRAME-BASED MEASUREMENT</div>
   </section>
-  <p class="note" id="provider"></p>
 </main>
-<script src="/static/common.js"></script>
+
+<dialog class="about-dialog" id="about-dialog" aria-labelledby="about-title">
+  <button class="dialog-close" id="about-close" aria-label="Close">×</button>
+  <div class="hero-kicker"><span class="status-dot"></span> ABOUT ROTORSENSE</div>
+  <h2 id="about-title">A clearer view of<br>rotating equipment.</h2>
+  <p>RotorSense compares slow-motion video of industrial equipment with a registered healthy reference. It measures visible motion by component and frequency band to help teams spot changes worth inspecting.</p>
+  <p class="about-note">Video-based screening supports inspection. It does not confirm a fault or replace calibrated vibration instruments.</p>
+</dialog>
 <script>
-const form = document.getElementById('form');
-const submit = document.getElementById('submit');
-const files = {};
-
-for (const role of ['normal', 'candidate']) {
-  const drop = document.getElementById('drop-' + role);
-  const input = drop.querySelector('input');
-  const show = (file) => {
-    files[role] = file;
-    drop.classList.toggle('filled', !!file);
-    drop.querySelector('.file').textContent = file ? `${file.name} · ${fmtBytes(file.size)}` : '';
-    submit.disabled = !(files.normal && files.candidate);
-  };
-  input.addEventListener('change', () => show(input.files[0]));
-  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
-  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-  drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) show(e.dataTransfer.files[0]); });
-}
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const err = document.getElementById('form-error'); err.innerHTML = '';
-  if (files.normal === files.candidate) { err.innerHTML = '<div class="error">두 영상은 서로 다른 파일이어야 해요.</div>'; return; }
-  if (window.maxRequestMb && (files.normal.size + files.candidate.size) > window.maxRequestMb * 1e6) {
-    err.innerHTML = `<div class="error">외부 주소로는 두 영상을 합쳐 ${window.maxRequestMb}MB까지 올릴 수 있어요. 영상을 3~4초로 짧게 찍어 주세요.</div>`; return;
-  }
-  const data = new FormData();
-  data.append('normal', files.normal); data.append('candidate', files.candidate);
-  data.append('capture_fps', form.capture_fps.value || '240');
-  data.append('same_speed', form.same_speed.checked); data.append('fixed_camera', form.fixed_camera.checked);
-  const xhr = new XMLHttpRequest();
-  const bar = document.getElementById('upload-bar'); const text = document.getElementById('upload-text');
-  bar.hidden = false; submit.disabled = true;
-  xhr.upload.onprogress = (ev) => {
-    if (!ev.lengthComputable) return;
-    const pct = Math.round(ev.loaded / ev.total * 100);
-    bar.firstElementChild.style.width = pct + '%';
-    text.textContent = pct < 100 ? `영상 올리는 중… ${pct}%` : '영상 확인 중…';
-  };
-  xhr.onload = () => {
-    let body = {}; try { body = JSON.parse(xhr.responseText); } catch (_) {}
-    if (xhr.status === 200) { location.href = body.url; return; }
-    err.innerHTML = `<div class="error">${esc(body.detail || '업로드에 실패했어요.')}</div>`;
-    bar.hidden = true; text.textContent = ''; submit.disabled = false;
-  };
-  xhr.onerror = () => { err.innerHTML = '<div class="error">서버에 연결할 수 없어요. 프로그램이 켜져 있는지 확인해주세요.</div>'; submit.disabled = false; bar.hidden = true; };
-  xhr.open('POST', '/api/jobs'); xhr.send(data);
-});
-
-async function loadJobs() {
-  const jobs = await (await fetch('/api/jobs')).json();
-  const list = document.getElementById('jobs');
-  if (!jobs.length) return;
-  list.innerHTML = jobs.map(j => `<li>
-      <div style="min-width:0"><div class="names"><a href="/jobs/${j.id}">${esc(j.inputs?.normal?.filename || '')} → ${esc(j.inputs?.candidate?.filename || '')}</a></div>
-      <div class="when">${esc(fmtTime(j.created_at))}</div></div>
-      ${stateBadge(j.state, j.label)}</li>`).join('');
-}
-async function loadConfig() {
-  const c = await (await fetch('/api/config')).json();
-  window.maxRequestMb = c.max_request_mb;
-  if (c.provider) document.getElementById('provider').textContent = `AI: ${c.provider_label || c.provider} · 모델 ${c.model || '-'}`;
-  if (c.key_missing) document.getElementById('form-error').innerHTML = '<div class="warn">API 키가 설정되지 않았어요. DevDay 폴더의 settings.py에 키를 넣고 프로그램을 다시 켜주세요.</div>';
-}
-loadJobs(); loadConfig();
+const aboutDialog = document.getElementById('about-dialog');
+document.getElementById('about-open').addEventListener('click', () => aboutDialog.showModal());
+document.getElementById('about-close').addEventListener('click', () => aboutDialog.close());
+aboutDialog.addEventListener('click', (event) => { if (event.target === aboutDialog) aboutDialog.close(); });
 </script>
 </body>
 </html>

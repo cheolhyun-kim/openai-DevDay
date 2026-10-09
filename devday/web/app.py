@@ -31,6 +31,7 @@ VIDEO_EXT = {'.mov', '.mp4', '.m4v', '.avi'}
 SERVE_EXT = {'.png', '.jpg', '.jpeg', '.json', '.html', '.txt'}
 ARCHIVE_EXCLUDE = {'input', 'frames', 'frames.json'}
 JOB_ID = re.compile(r'^\d{8}-\d{6}-[0-9a-f]{6}$')
+EQUIPMENT_ID = re.compile(r'^eq_[0-9a-f]{16}$')
 STAGES = [('frames', '대표 장면 추출'), ('roi_api', 'AI가 측정할 부위 고르기'), ('alignment', '두 영상 위치 맞추기'),
           ('measurement_reference', '정상 영상 흔들림 측정'), ('measurement_candidate', '점검 영상 흔들림 측정'),
           ('maps', '측정 지도 그리기'), ('diagnosis_api', 'AI 판정'), ('finished', '완료')]
@@ -240,7 +241,16 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
                 m = store.read(job_id); m['events'].append({**event, 'at': now()}); m['stage'] = event['stage']; store.write(job_id, m)
         try:
             provider = provider_factory()
-            result = run_pipeline(d / 'input' / meta['inputs']['normal']['stored'], d / 'input' / meta['inputs']['candidate']['stored'],
+            if meta.get('equipment', {}).get('id'):
+                equipment_path=equipment_dir(meta['equipment']['id'])
+                equipment_meta=json.loads((equipment_path/'equipment.json').read_text(encoding='utf-8'))
+                normal_name=Path(equipment_meta.get('normal',{}).get('stored','')).name
+                normal_path=(equipment_path/normal_name).resolve()
+                if equipment_path.resolve() not in normal_path.parents or not normal_path.is_file():
+                    raise ValueError('The saved healthy reference video is missing.')
+            else:
+                normal_path = d / 'input' / meta['inputs']['normal']['stored']
+            result = run_pipeline(normal_path, d / 'input' / meta['inputs']['candidate']['stored'],
                                   capture_fps=meta['capture_fps'], output_dir=d / 'run', provider=provider,
                                   conditions={'same_speed_confirmed': meta['same_speed'], 'fixed_camera_confirmed': meta['fixed_camera'], 'same_setup_declared': True,
                                               'input_warnings': meta.get('warnings', [])},
@@ -252,6 +262,106 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
     @app.get('/', response_class=HTMLResponse)
     def index():
         return (STATIC / 'index.html').read_text(encoding='utf-8')
+
+    @app.get('/equipment', response_class=HTMLResponse)
+    def equipment_page():
+        return (STATIC / 'equipment.html').read_text(encoding='utf-8')
+
+    @app.get('/diagnose', response_class=HTMLResponse)
+    def diagnose_page():
+        return (STATIC / 'diagnose.html').read_text(encoding='utf-8')
+
+    @app.get('/history', response_class=HTMLResponse)
+    def history_page():
+        return (STATIC / 'history.html').read_text(encoding='utf-8')
+
+    def equipment_dir(equipment_id):
+        if not EQUIPMENT_ID.fullmatch(equipment_id or ''):
+            raise HTTPException(404, 'Equipment was not found.')
+        path=store.root/'equipment'/equipment_id
+        if not (path/'equipment.json').is_file():
+            raise HTTPException(404, 'Equipment was not found.')
+        return path
+
+    def save_video(upload,destination,limit_mb,capture_fps):
+        suffix=Path(upload.filename or '').suffix.lower()
+        if suffix not in VIDEO_EXT:
+            raise HTTPException(400,'Upload a .mov, .mp4, .m4v, or .avi video.')
+        size=0
+        with open(destination,'wb') as output:
+            while chunk:=upload.file.read(1<<20):
+                size+=len(chunk)
+                if size>limit_mb*1024*1024:
+                    raise HTTPException(413,f'Video exceeds the {limit_mb} MB upload limit.')
+                output.write(chunk)
+        try:
+            info,warnings=probe(destination,capture_fps)
+        except ValueError as exc:
+            raise HTTPException(400,str(exc)) from exc
+        return {'filename':Path(upload.filename).name,'stored':Path(destination).name,'bytes':size,**info},warnings
+
+    @app.get('/api/equipment')
+    def list_equipment():
+        root=store.root/'equipment'
+        items=[]
+        if root.is_dir():
+            for path in sorted(root.glob('*/equipment.json'),reverse=True):
+                try:
+                    item=json.loads(path.read_text(encoding='utf-8'))
+                    if EQUIPMENT_ID.fullmatch(item.get('id','')) and (path.parent/item.get('normal',{}).get('stored','')).is_file():items.append(item)
+                except (OSError,ValueError,TypeError):
+                    continue
+        return items
+
+    @app.post('/api/equipment')
+    def register_equipment(name: str = Form(...), model: str = Form(''), normal: UploadFile = File(...), capture_fps: float = Form(240.0)):
+        name=name.strip();model=model.strip()
+        if not name or len(name)>80 or len(model)>120:
+            raise HTTPException(400,'Enter an equipment name (up to 80 characters) and a model up to 120 characters.')
+        if not (1<=capture_fps<=10000):
+            raise HTTPException(400,'Capture FPS must be between 1 and 10000.')
+        limit=min(max_upload_mb,int((provider_info or {}).get('max_request_mb') or max_upload_mb))
+        equipment_id='eq_'+uuid.uuid4().hex[:16]
+        folder=store.root/'equipment'/equipment_id;folder.mkdir(parents=True,exist_ok=False)
+        try:
+            suffix=Path(normal.filename or '').suffix.lower()
+            reference,warnings=save_video(normal,folder/f'reference{suffix}',limit,capture_fps)
+            item={'id':equipment_id,'name':name,'model':model,'capture_fps':capture_fps,'created_at':now(),'normal':reference,'warnings':warnings}
+            (folder/'equipment.json').write_text(json.dumps(item,ensure_ascii=False,indent=2),encoding='utf-8')
+            return item
+        except Exception:
+            shutil.rmtree(folder,ignore_errors=True)
+            raise
+
+    @app.post('/api/jobs/from-equipment')
+    def create_equipment_job(equipment_id: str = Form(...), candidate: UploadFile = File(...),
+                             same_speed: bool = Form(False), fixed_camera: bool = Form(False)):
+        folder=equipment_dir(equipment_id)
+        item=json.loads((folder/'equipment.json').read_text(encoding='utf-8'))
+        normal=item.get('normal') or {}
+        reference_name=Path(normal.get('stored','')).name
+        reference_path=(folder/reference_name).resolve()
+        if not reference_name or folder.resolve() not in reference_path.parents or not reference_path.is_file():
+            raise HTTPException(400,'The saved healthy reference video is missing. Re-register this equipment.')
+        capture_fps=float(item.get('capture_fps') or 240)
+        if not (1<=capture_fps<=10000):
+            raise HTTPException(400,'The registered capture FPS is invalid. Re-register this equipment.')
+        limit=min(max_upload_mb,int((provider_info or {}).get('max_request_mb') or max_upload_mb))
+        job_id=store.new_id();d=store.root/job_id;(d/'input').mkdir(parents=True)
+        try:
+            normal_input={**normal,'source':'registered-equipment'}
+            candidate_suffix=Path(candidate.filename or '').suffix.lower()
+            candidate_input,warnings=save_video(candidate,d/'input'/f'candidate{candidate_suffix}',limit,capture_fps)
+            meta={'id':job_id,'created_at':now(),'state':'queued','stage':None,'events':[],
+                  'inputs':{'normal':normal_input,'candidate':candidate_input},'equipment':{'id':item['id'],'name':item['name'],'model':item.get('model','')},
+                  'capture_fps':capture_fps,'same_speed':same_speed,'fixed_camera':fixed_camera,
+                  'warnings':warnings+item.get('warnings',[]),'provider':provider_info or {}}
+            (d/'job.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+            executor.submit(run_job,job_id)
+            return {'id':job_id,'url':f'/jobs/{job_id}','warnings':meta['warnings']}
+        except Exception:
+            shutil.rmtree(d,ignore_errors=True)
+            raise
 
     def ensure_demo_job():
         """Make one read-only demo snapshot from an existing completed analysis; never call a model."""
@@ -342,7 +452,7 @@ def create_app(root, provider_factory, provider_info=None, max_upload_mb=2048, a
 
     @app.get('/api/jobs')
     def jobs():
-        return [{k: m.get(k) for k in ('id', 'created_at', 'state', 'stage', 'inputs')} | {'label': (m.get('decision') or {}).get('label')} for m in store.all() if not m.get('is_demo')][:30]
+        return [{k: m.get(k) for k in ('id', 'created_at', 'state', 'stage', 'inputs', 'equipment')} | {'label': (m.get('decision') or {}).get('label')} for m in store.all() if not m.get('is_demo')][:30]
 
     @app.post('/api/jobs')
     def create_job(normal: UploadFile = File(...), candidate: UploadFile = File(...), capture_fps: float = Form(240.0),

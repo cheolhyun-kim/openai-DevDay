@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Analysis History · RotorSense</title><link rel="stylesheet" href="/static/style.css"></head>
+<body class="app-body"><main class="app-shell">
+  <header class="app-top"><a class="brand app-brand" href="/"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span>ROTOR<span class="brand-light">SENSE</span><small>INDUSTRIAL INTELLIGENCE</small></span></a><nav><a href="/">Home</a><a href="/equipment">Register Equipment</a><a class="app-nav-cta" href="/diagnose">Detect Anomaly ↗</a></nav></header>
+  <div class="app-heading"><div class="hero-kicker"><span class="status-dot"></span> INSPECTION LOG</div><h1>Analysis History</h1><p>Review past inspection videos and their results.</p></div>
+  <section class="app-card"><div id="history-list" class="history-list"><p class="muted">Loading records…</p></div></section>
+</main><script src="/static/common.js"></script><script>
+const list=document.getElementById('history-list');
+function outcome(job){if(job.state==='failed')return ['Unable to analyze','failed'];if(job.state!=='done')return ['Analysis in progress','running'];const label=job.label||'insufficient';return [{abnormal:'Anomaly flagged',normal:'No significant change',insufficient:'Inconclusive'}[label]||'Complete',label];}
+async function loadHistory(){try{const jobs=await(await fetch('/api/jobs')).json();list.innerHTML=jobs.length?jobs.map(j=>{const [result,state]=outcome(j),asset=j.equipment?.name||j.inputs?.normal?.filename||'Equipment';return `<a class="history-row" href="/jobs/${encodeURIComponent(j.id)}"><div class="history-status ${esc(state)}"></div><div class="history-copy"><strong>${esc(asset)}</strong><span>${esc(j.inputs?.candidate?.filename||j.inputs?.candidate?.stored||'Inspection video')}</span><small>${new Date(j.created_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}</small></div><span class="history-result ${esc(state)}">${esc(result)}</span><span class="history-arrow">↗</span></a>`;}).join(''):'<div class="empty-assets">No analyses yet. <a href="/diagnose">Start your first inspection ↗</a></div>';}catch(_){list.innerHTML='<p class="muted">Analysis history is unavailable right now.</p>';}}
+loadHistory();
+</script></body></html>
