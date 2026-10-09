@@ -5,11 +5,13 @@ APP_DIR="$(cd "$(dirname "$0")" && pwd)"
 BRANCH="main"
 PORT="8001"
 LOG_DIR="$APP_DIR/logs"
-PID_FILE="$APP_DIR/.devday_web.pid"
-TUNNEL_PID_FILE="$APP_DIR/.devday_tunnel.pid"
 TUNNEL_URL_FILE="$APP_DIR/public_url.txt"
 ACCESS_CODE_FILE="$APP_DIR/.devday_access_code"
 CLOUDFLARED="/opt/homebrew/bin/cloudflared"
+LAUNCH_AGENTS="$HOME/Library/LaunchAgents"
+LAUNCH_DOMAIN="gui/$(id -u)"
+WEB_LABEL="com.devday.web"
+TUNNEL_LABEL="com.devday.tunnel"
 
 mkdir -p "$LOG_DIR"
 cd "$APP_DIR"
@@ -40,33 +42,17 @@ if ! "$APP_DIR/.venv/bin/python" -c 'from web import load_settings; raise System
   exit 1
 fi
 
-if [[ -f "$PID_FILE" ]]; then
-  old_pid="$(cat "$PID_FILE")"
-  if [[ "$old_pid" =~ ^[0-9]+$ ]] && kill -0 "$old_pid" 2>/dev/null; then
-    kill "$old_pid" || true
-    for _ in {1..30}; do
-      kill -0 "$old_pid" 2>/dev/null || break
-      sleep 1
-    done
-    kill -0 "$old_pid" 2>/dev/null && kill -9 "$old_pid" || true
-  fi
-  rm -f "$PID_FILE"
-fi
+mkdir -p "$LAUNCH_AGENTS"
+cp "$APP_DIR/launchd/$WEB_LABEL.plist" "$LAUNCH_AGENTS/$WEB_LABEL.plist"
+cp "$APP_DIR/launchd/$TUNNEL_LABEL.plist" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"
 
-# Close any previous listener on our dedicated app port, then launch the latest code.
-listener_pid="$(lsof -tiTCP:"$PORT" -sTCP:LISTEN 2>/dev/null || true)"
-if [[ -n "$listener_pid" ]]; then
-  kill $listener_pid || true
-  sleep 2
-fi
-
-nohup "$APP_DIR/.venv/bin/python" "$APP_DIR/web.py" --no-browser --port "$PORT" \
-  >> "$LOG_DIR/web.log" 2>&1 < /dev/null &
-echo "$!" > "$PID_FILE"
+# Run under launchd so GitHub Actions does not terminate the app with the job process.
+launchctl bootout "$LAUNCH_DOMAIN/$WEB_LABEL" >/dev/null 2>&1 || true
+launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$WEB_LABEL.plist"
 
 for _ in {1..30}; do
   if curl --silent --fail "http://127.0.0.1:$PORT/login" >/dev/null; then
-    echo "DevDay is running on port $PORT (pid $(cat "$PID_FILE"))."
+    echo "DevDay is running on port $PORT under launchd."
     break
   fi
   sleep 1
@@ -82,17 +68,9 @@ if [[ ! -x "$CLOUDFLARED" ]]; then
   exit 1
 fi
 
-tunnel_pid=""
-if [[ -f "$TUNNEL_PID_FILE" ]]; then
-  tunnel_pid="$(cat "$TUNNEL_PID_FILE")"
-fi
-if [[ ! "$tunnel_pid" =~ ^[0-9]+$ ]] || ! kill -0 "$tunnel_pid" 2>/dev/null; then
-  rm -f "$TUNNEL_PID_FILE"
+if ! launchctl print "$LAUNCH_DOMAIN/$TUNNEL_LABEL" >/dev/null 2>&1; then
   : > "$LOG_DIR/tunnel.log"
-  nohup "$CLOUDFLARED" tunnel --no-autoupdate --url "http://127.0.0.1:$PORT" \
-    >> "$LOG_DIR/tunnel.log" 2>&1 < /dev/null &
-  tunnel_pid="$!"
-  echo "$tunnel_pid" > "$TUNNEL_PID_FILE"
+  launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"
 fi
 
 for _ in {1..30}; do

@@ -9,7 +9,5 @@ input/*
 !input/README.txt
 web_jobs/
 logs/
-.devday_web.pid
-.devday_tunnel.pid
 .devday_access_code
 public_url.txt

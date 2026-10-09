@@ -50,5 +50,5 @@
 
 | 날짜 | 새로 만든/검증한 내용 | 근거 |
 |---|---|---|
-| 2026-10-09 | 해커톤 기간 작업: 맥 self-hosted runner에서 `main` push 배포 workflow와 앱 재시작 스크립트를 구성하고 팀 배포 절차를 문서화함. runner 등록은 GitHub 인증이 만료되어 아직 하지 못함. | `.github/workflows/deploy-mac.yml`, `deploy_mac.sh`, `README.md` |
+| 2026-10-09 | 해커톤 기간 작업: 맥 self-hosted runner에서 `main` push 배포 workflow, `launchd` 앱·터널 서비스, 로컬 접속 코드 보관, 배포 스크립트를 구성하고 팀 배포 절차를 문서화함. | `.github/workflows/deploy-mac.yml`, `deploy_mac.sh`, `launchd/`, `README.md` |
 |  |  |  |
