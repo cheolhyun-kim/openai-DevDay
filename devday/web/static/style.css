@@ -202,7 +202,7 @@ td.nw, th.nw { white-space: nowrap; }
 @media (max-width:620px) { .hero h1 { font-size:clamp(34px,9vw,52px); }.hero-fan { height:50%;top:30%; } }
 @media (min-width:621px) and (max-width:900px) { .hero-fan { height:54%;top:25%; } }
 
-/* RotorIQ operations hero inspired by the supplied sky-based SaaS reference */
+/* RotorSense operations hero inspired by the supplied sky-based SaaS reference */
 .landing-body,.app-body { --bg:#071a43;--surface:#0d214d;--surface-2:#132b5d;--text:#f1f6fc;--muted:#a5bad8;--line:#304c7c;--accent:#5b98ed;--accent-ink:#071a43;background:var(--bg);color:var(--text); }
 .landing-body { min-height:100svh;overflow-x:hidden;background:#164391; }
 .landing-shell { position:relative;isolation:isolate;width:100%;max-width:none;min-height:100svh;margin:0 auto;padding:24px;overflow:hidden;background:transparent; }
