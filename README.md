@@ -29,7 +29,7 @@
 
 ### 최초 1회 설정
 
-1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 `~/Library/Application Support/DevDay-runner`에 설치하고, config 명령에 label `devday`를 등록합니다. 배포용 앱 clone은 `~/DevDay-deploy`에 둡니다.
+1. GitHub 저장소의 **Settings → Actions → Runners → New self-hosted runner**에서 macOS / ARM64 안내를 열어 runner를 `~/DevDay-runner`에 설치하고, config 명령에 label `devday`를 등록합니다. 배포용 앱 clone은 `~/DevDay-deploy`에 둡니다.
 2. 표시된 GitHub 안내에 따라 runner를 macOS `launchd` 서비스로 설치·실행합니다. 맥이 켜져 있고 인터넷에 연결되어 있어야 합니다.
 3. `settings.py`에 `ACCESS_CODE`가 있으면 그 값을 사용합니다. 없으면 배포 스크립트가 접속 코드를 로컬 파일 `~/DevDay-deploy/.devday_access_code`에 생성합니다. 이 파일은 GitHub에 올라가지 않으며, 팀과 안전하게 공유하세요.
 4. 저장소 `main`에 커밋을 push합니다. 첫 성공 배포가 웹 앱과 독립 HTTPS 터널을 시작하고 주소를 `~/DevDay-deploy/public_url.txt`와 GitHub **Actions** 로그에 기록합니다. 접속 코드는 Actions 로그에 출력하지 않습니다.
