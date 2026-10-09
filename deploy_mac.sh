@@ -48,9 +48,23 @@ mkdir -p "$LAUNCH_AGENTS"
 cp "$APP_DIR/launchd/$WEB_LABEL.plist" "$LAUNCH_AGENTS/$WEB_LABEL.plist"
 cp "$APP_DIR/launchd/$TUNNEL_LABEL.plist" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"
 
-# Run under launchd so GitHub Actions does not terminate the app with the job process.
-launchctl bootout "$LAUNCH_DOMAIN/$WEB_LABEL" >/dev/null 2>&1 || true
-launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$WEB_LABEL.plist"
+# Keep the server outside the Actions job process. A loaded LaunchAgent is restarted
+# in place; bootout/bootstrap on every push can race launchd and fail with error 5.
+WEB_SERVICE="$LAUNCH_DOMAIN/$WEB_LABEL"
+WEB_PLIST="$LAUNCH_AGENTS/$WEB_LABEL.plist"
+if launchctl print "$WEB_SERVICE" >/dev/null 2>&1; then
+  launchctl kickstart -k "$WEB_SERVICE"
+else
+  if ! launchctl bootstrap "$LAUNCH_DOMAIN" "$WEB_PLIST"; then
+    # Compatibility fallback for macOS launchctl contexts that reject bootstrap.
+    if ! launchctl load -w "$WEB_PLIST"; then
+      echo "Could not load $WEB_LABEL in $LAUNCH_DOMAIN. Run this once from Terminal while signed in:"
+      echo "launchctl bootstrap $LAUNCH_DOMAIN $WEB_PLIST"
+      exit 1
+    fi
+  fi
+  launchctl kickstart -k "$WEB_SERVICE"
+fi
 
 for _ in {1..30}; do
   if curl --silent --fail "http://127.0.0.1:$PORT/login" >/dev/null; then
@@ -73,7 +87,12 @@ fi
 if ! launchctl print "$LAUNCH_DOMAIN/$TUNNEL_LABEL" >/dev/null 2>&1; then
   : > "$LOG_DIR/tunnel.log"
   : > "$LOG_DIR/tunnel.error.log"
-  launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"
+  if ! launchctl bootstrap "$LAUNCH_DOMAIN" "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"; then
+    if ! launchctl load -w "$LAUNCH_AGENTS/$TUNNEL_LABEL.plist"; then
+      echo "Could not load $TUNNEL_LABEL in $LAUNCH_DOMAIN."
+      exit 1
+    fi
+  fi
 fi
 
 for _ in {1..30}; do
